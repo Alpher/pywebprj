@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv=refresh content="5;url=/accounts/login/">
+<meta charset="utf-8">
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- 可选的Bootstrap主题文件（一般不使用） -->
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap-theme.min.css"></script>
+
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<title>注销</title>
+</head>
+<body>
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div id="div1" class="jumbotron">
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+
+<script type="text/javascript">  
+//设定倒数秒数  
+var t = 5;  
+//显示倒数秒数  
+function showTime(){  
+    t -= 1;  
+    document.getElementById('div1').innerHTML= "注销成功！"+t+"秒后跳转，如无法跳转，请点击<a href=/accounts/login/>返回</a>登录页面";  
+    if(t==0){  
+        location.href='/accounts/login/';  
+    }  
+    //每秒执行一次,showTime()  
+    setTimeout("showTime()",1000);  
+}  
+  
+  
+//执行showTime()  
+showTime();  
+</script>  

@@ -1,0 +1,141 @@
+{% extends "index_base.html" %}
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="row clearfix">
+				<div class="col-md-6 column">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								基础属性(不可修改)
+							</h3>
+						</div>
+						<div class="panel-body">
+			<table class="table table-hover table-striped">
+				<thead>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							ID
+						</td>
+						<td>
+							{{userid}}
+						</td>
+					</tr>
+					<tr class="success">
+						<td>
+							账号
+						</td>
+						<td>
+							{{username}}
+						</td>
+					</tr>
+					<tr class="error">
+						<td>
+							邮箱
+						</td>
+						<td>
+							{{useremail}}
+						</td>
+					</tr>
+					<tr class="warning">
+						<td>
+							当前积分
+						</td>
+						<td>
+							200
+						</td>
+					</tr>
+					<tr>
+						<td>
+							头衔
+						</td>
+						<td>
+							幼龟
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							加入时间
+						</td>
+						<td>
+							{{userdj}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+						</div>
+						<div class="panel-footer">
+						
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 column">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								个性设置
+							</h3>
+						</div>
+						<div class="panel-body">
+							{% if form.errors %}
+								{{form.nickname.errors}}
+							{% endif %}
+							<form action="" method="post">{% csrf_token %}
+								<div class="form-group">
+									<label for="id_nickname" class="col-sm-2 control-label">昵称:</label>
+									<div class="col-sm-10">
+									{{form.nickname}} 
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<label for="id_sex" class="col-sm-2 control-label">性别:</label>
+									<div class="col-sm-10">
+									{{form.sex}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<label for="id_birthdt" class="col-sm-2 control-label">生日:</label>
+									<div class="col-sm-10">
+									{{form.birthdt}}(格式:月/日/年)
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<label for="id_region" class="col-sm-2 control-label">地区:</label>
+									<div class="col-sm-10">
+									{{form.region}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+								</div>
+
+								<div>
+
+									<button type="submit" class="btn btn-default btn-info">保存</button>
+								</div>
+						</div>
+
+
+<!-- 			<form class="form-horizontal" role="form">{% csrf_token %}
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-2 control-label">昵称:</label>
+					<div class="col-sm-10">
+						{{form.nickname}}
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						 <button type="submit" class="btn btn-default">保存</button>
+					</div>
+				</div>
+			</form> -->
+
+
+						<div class="panel-footer">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
