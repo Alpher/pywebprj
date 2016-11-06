@@ -65,4 +65,4 @@ class ExtraInfo(ProfileUser):
     region = models.ForeignKey(Region, verbose_name=u'地区', default=1)
     acct_type = models.ForeignKey(AcctType, verbose_name=u'账号类型', default=1)
     status = models.ForeignKey(AcctStatus, verbose_name=u'账号状态', default=1)
-    phone_number= models.CharField(max_length = 20, verbose_name=u'手机', null=True, blank=True) 
+    phone= models.CharField(max_length = 20, verbose_name=u'手机', null=True, blank=True) 

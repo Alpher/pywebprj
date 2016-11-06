@@ -1,0 +1,21 @@
+{% extends "index_base.html" %}
+
+<!-- {% block js_content %}
+<script>
+$(document).ready(setTimeout(function(){
+    location.href = "/accounts/logout/";
+},3000));
+</script>
+{% endblock %} -->
+
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="alert alert-dismissable alert-success">
+				<strong>密码修改成功！即将注销,请用新的密码重新登录。</strong>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

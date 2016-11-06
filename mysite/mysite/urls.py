@@ -29,4 +29,6 @@ urlpatterns = [
     url(r'^accounts/logout/$', logout,{'template_name':'logout.html'}),
     url(r'^$',homeindex),
     url(r'^myprofile/$',saveUserInfo),
+    url(r'^changepwd/$',changepwd),
+    url(r'^pwdchanged/$',pwdchanged),
 ] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

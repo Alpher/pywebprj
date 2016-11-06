@@ -1,8 +1,23 @@
 {% extends "index_base.html" %}
+
+{% block js_content %}
+<script>
+$(document).ready(function(){
+    $("#saveresdiv").fadeOut(2000);
+});
+</script>
+{% endblock %}
+
 {% block middle_area %}
 <div class="container">
 	<div class="row clearfix">
 		<div class="col-md-12 column">
+		{% if showSaveAlert %}
+			<div id="saveresdiv" class="alert alert-dismissable alert-info">
+				 <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
+				<strong>保存成功!</strong>
+			</div>
+		{% endif %}
 			<div class="row clearfix">
 				<div class="col-md-6 column">
 					<div class="panel panel-default">
@@ -45,7 +60,23 @@
 							当前积分
 						</td>
 						<td>
-							200
+							{{userscores}}
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							账号类型
+						</td>
+						<td>
+							{{accttype}}
+						</td>
+					</tr>
+					<tr class="success">
+						<td>
+							账号状态
+						</td>
+						<td>
+							{{acctstatus}}
 						</td>
 					</tr>
 					<tr>
@@ -53,7 +84,7 @@
 							头衔
 						</td>
 						<td>
-							幼龟
+							{{usertitle}}
 						</td>
 					</tr>
 					<tr class="info">
@@ -82,30 +113,39 @@
 						</div>
 						<div class="panel-body">
 							{% if form.errors %}
-								{{form.nickname.errors}}
+								{% if form.nickname.errors %}
+									{{form.nickname.errors}}
+								{% else %}
+									{{form.phone.errors}}
+								{% endif %}
 							{% endif %}
 							<form action="" method="post">{% csrf_token %}
 								<div class="form-group">
 									<label for="id_nickname" class="col-sm-2 control-label">昵称:</label>
 									<div class="col-sm-10">
-									{{form.nickname}} 
+									{{form.nickname}}(*必填,大于4个字符)
 									</div>
-									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
 									<label for="id_sex" class="col-sm-2 control-label">性别:</label>
 									<div class="col-sm-10">
 									{{form.sex}}
 									</div>
-									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
 									<label for="id_birthdt" class="col-sm-2 control-label">生日:</label>
 									<div class="col-sm-10">
-									{{form.birthdt}}(格式:月/日/年)
+									{{form.birth}}(格式:月/日/年)
 									</div>
-									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
 									<label for="id_region" class="col-sm-2 control-label">地区:</label>
 									<div class="col-sm-10">
 									{{form.region}}
 									</div>
-									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+									<label for="id_phone" class="col-sm-2 control-label">手机:</label>
+									<div class="col-sm-10">
+									{{form.phone}}(选填)
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
 								</div>
 
 								<div>
