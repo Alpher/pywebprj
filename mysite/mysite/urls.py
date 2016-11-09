@@ -20,6 +20,7 @@ from django.contrib import admin
 from mysite.views import userLogin
 from django.contrib.auth.views import login, logout
 from profiles.views import *
+from credit.views import *
 #from django.conf import settings
 #from django.conf.urls.static import static
 
@@ -31,4 +32,6 @@ urlpatterns = [
     url(r'^myprofile/$',saveUserInfo),
     url(r'^changepwd/$',changepwd),
     url(r'^pwdchanged/$',pwdchanged),
+    url(r'^mycredit/$',checkcredit),
+    url(r'^myrewards/(\d{1,2})/$',checkreward),
 ] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

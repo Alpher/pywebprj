@@ -4,7 +4,7 @@ __author__ = 'Alpher'
 from os import path
 from django.apps import AppConfig
 
-VERBOSE_APP_NAME = u'账户参数'
+VERBOSE_APP_NAME = u'兑换'
 
 
 def get_current_app_name(file):

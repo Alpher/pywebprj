@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from profiles.forms import *
-from django.http import HttpResponse
+#from django.http import HttpResponse
 
 # Create your views here.
 

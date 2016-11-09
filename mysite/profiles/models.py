@@ -11,33 +11,51 @@ import datetime
 
 class AcctType(models.Model):
     """账号类型定义"""
-    acct_type_lev = models.IntegerField(default=1)
-    acct_type_dec = models.CharField(max_length=50, null=True, blank=True)
+    acct_type_lev = models.IntegerField(verbose_name=u'账号类型ID')
+    acct_type_dec = models.CharField(verbose_name=u'账号类型名称',max_length=50, null=True, blank=True)
 
     def __unicode__(self):
         return self.acct_type_dec
 
+    class Meta:
+        verbose_name = u'账号类型'
+        verbose_name_plural = u'账号类型'
+
 class AcctStatus(models.Model):
     """账号状态定义"""
-    acctst_lev = models.IntegerField(default=1)
-    acctst_dec = models.CharField(max_length=50, null=True, blank=True)
+    acctst_lev = models.IntegerField(verbose_name=u'账号状态ID')
+    acctst_dec = models.CharField(verbose_name=u'账号状态名称',max_length=50, null=True, blank=True)
 
     def __unicode__(self):
         return self.acctst_dec
 
+    class Meta:
+        verbose_name = u'账号状态'
+        verbose_name_plural = u'账号状态'
+
 class Region(models.Model):
     """地区定义"""
-    region_id = models.IntegerField(null=True, blank=True)
-    region_dec = models.CharField(max_length=50, null=True, blank=True)
+    region_id = models.IntegerField(verbose_name=u'账号所属地区ID',null=True, blank=True)
+    region_dec = models.CharField(verbose_name=u'账号所属地区名称',max_length=50, null=True, blank=True)
 
     def __unicode__(self):
         return self.region_dec
 
+    class Meta:
+        verbose_name = u'地区'
+        verbose_name_plural = u'地区'
+
 class UserTitle(models.Model):
-    title_id = models.IntegerField(default=1)
-    title_dec = models.CharField(max_length=50, null=True, blank=True)
+    """头衔定义"""
+    title_id = models.IntegerField(verbose_name=u'账号头衔ID')
+    title_dec = models.CharField(verbose_name=u'账号头衔名称',max_length=50, null=True, blank=True)
+
     def __unicode__(self):
         return self.title_dec
+
+    class Meta:
+        verbose_name = u'头衔'
+        verbose_name_plural = u'头衔'
         
 
 class ProfileBase(type):  

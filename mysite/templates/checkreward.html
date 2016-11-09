@@ -1,0 +1,131 @@
+{% extends "index_base.html" %}
+
+{% block js_content %}
+<script>
+$(document).ready(function(){
+    $("#ret").click(function(){
+    	window.location.href="/mycredit/";
+    })
+});
+</script>
+{% endblock %}
+
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-8 column">
+		{% if not reward %}
+			<div class="alert alert-dismissable alert-danger">
+				<strong>无相关数据!</strong><a href="/mycredit/" class="alert-link">返回</a>
+			</div>
+		{% else %}
+			<table class="table table-hover table-striped">
+				<tbody>
+					<tr class="info">
+						<td>
+							中奖账号
+						</td>
+						<td>
+							{{reward.username}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							奖品
+						</td>
+						<td>
+							{{reward.reward}}
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							中奖时间
+						</td>
+						<td>
+							{{reward.reward_dt|date:"Y-m-d"}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							是否已领奖
+						</td>
+						<td>
+							{% ifequal reward.isExchg 1 %}
+								是
+							{% else %}
+								否
+							{% endifequal %}
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							失效日期
+						</td>
+						<td style="color: red;font-weight:bold;">
+							{{reward.reward.reward_enddt|date:"Y-m-d"}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							领奖人姓名
+						</td>
+						<td>
+							{{reward.exchg_name}}
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							领奖人手机
+						</td>
+						<td>
+							{{reward.exchg_phone}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							领奖人地址
+						</td>
+						<td>
+							{{reward.exchg_addr}}
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							领奖人邮编
+						</td>
+						<td>
+							{{reward.addr_code}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							快递单号
+						</td>
+						<td>
+							{{reward.express_id}}
+						</td>
+					</tr>
+					<tr class="info">
+						<td>
+							快递公司名称
+						</td>
+						<td>
+							{{reward.express_name}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							最后更新时间
+						</td>
+						<td>
+							{{reward.update_ts|date:"Y-m-d G:H:i"}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<button type="button" class="btn btn-primary btn-default" id="ret">返回</button>
+		{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock %}
