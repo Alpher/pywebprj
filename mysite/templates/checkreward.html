@@ -23,7 +23,11 @@ $(document).ready(function(){
 				<tbody>
 					<tr class="info">
 						<td>
-							中奖账号
+							{% if showRew %}
+								中奖账号
+							{% else %}
+								兑换账号
+							{% endif %}
 						</td>
 						<td>
 							{{reward.username}}
@@ -31,12 +35,17 @@ $(document).ready(function(){
 					</tr>
 					<tr>
 						<td>
-							奖品
+							{% if showRew %}
+								奖品
+							{% else %}
+								兑换物品
+							{% endif %}
 						</td>
 						<td>
 							{{reward.reward}}
 						</td>
 					</tr>
+				{% if showRew %}
 					<tr class="info">
 						<td>
 							中奖时间
@@ -57,7 +66,21 @@ $(document).ready(function(){
 							{% endifequal %}
 						</td>
 					</tr>
+				{% endif %}
 					<tr class="info">
+						<td>
+							{% if showRew %}
+								领奖日期
+							{% else %}
+								兑换日期
+							{% endif %}	
+						</td>
+						<td>
+							{{reward.exchg_dt|date:"Y-m-d"}}
+						</td>
+					</tr>
+				{% if showRew %}
+					<tr>
 						<td>
 							失效日期
 						</td>
@@ -65,7 +88,7 @@ $(document).ready(function(){
 							{{reward.reward.reward_enddt|date:"Y-m-d"}}
 						</td>
 					</tr>
-					<tr>
+					<tr class="info">
 						<td>
 							领奖人姓名
 						</td>
@@ -73,15 +96,21 @@ $(document).ready(function(){
 							{{reward.exchg_name}}
 						</td>
 					</tr>
-					<tr class="info">
+				{% endif %}
+					<tr>
 						<td>
-							领奖人手机
+							{% if showRew %}
+								领奖人手机
+							{% else %}
+								兑换人手机
+							{% endif %}	
 						</td>
 						<td>
 							{{reward.exchg_phone}}
 						</td>
 					</tr>
-					<tr>
+				{% if showRew %}
+					<tr class="info">
 						<td>
 							领奖人地址
 						</td>
@@ -89,7 +118,7 @@ $(document).ready(function(){
 							{{reward.exchg_addr}}
 						</td>
 					</tr>
-					<tr class="info">
+					<tr>
 						<td>
 							领奖人邮编
 						</td>
@@ -97,7 +126,7 @@ $(document).ready(function(){
 							{{reward.addr_code}}
 						</td>
 					</tr>
-					<tr>
+					<tr class="info">
 						<td>
 							快递单号
 						</td>
@@ -105,7 +134,7 @@ $(document).ready(function(){
 							{{reward.express_id}}
 						</td>
 					</tr>
-					<tr class="info">
+					<tr>
 						<td>
 							快递公司名称
 						</td>
@@ -113,12 +142,47 @@ $(document).ready(function(){
 							{{reward.express_name}}
 						</td>
 					</tr>
+				{% endif %}
+				{% if not showRew %}
 					<tr>
+						<td>
+							抵扣积分
+						</td>
+						<td style="color: red;font-weight:bold;">
+							{{reward.reward.reward_cost}}
+						</td>
+					</tr>
+					<tr  class="info">
+						<td>
+							卡品类型
+						</td>
+						<td>
+							{{ecard.ecardtype.ecardtype_desc}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							卡号
+						</td>
+						<td>
+							{{ecard.ecardnum}}
+						</td>
+					</tr>
+					<tr class="success">
+						<td>
+							卡密
+						</td>
+						<td>
+							{{ecard.ecardpsw}}
+						</td>
+					</tr>
+				{% endif %}
+					<tr class="info">
 						<td>
 							最后更新时间
 						</td>
 						<td>
-							{{reward.update_ts|date:"Y-m-d G:H:i"}}
+							{{reward.update_ts|date:"Y-m-d H:i:s"}}
 						</td>
 					</tr>
 				</tbody>

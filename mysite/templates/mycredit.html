@@ -43,6 +43,9 @@
 							是否已领奖
 						</th>
 						<th>
+							领奖日期
+						</th>
+						<th>
 							操作
 						</th>
 					</tr>
@@ -74,11 +77,26 @@
 							{% endifequal %}
 						</td>
 						<td>
-							{% ifequal reward.isExchg 1 %}
-								<a href="/myrewards/{{reward.id}}/">查看</a>
-							{% else %}
-								<a href="">领取</a>
-							{% endifequal %}
+							{{reward.exchg_dt|date:"Y-m-d"}}
+						</td>
+						<td>
+							{% for key,value in isOvdict.items %}
+								{% ifequal key reward.id %}
+									{% ifequal value 1 %}
+										{% ifequal reward.isExchg 1 %}
+											<a href="/myrewards/{{reward.id}}/">查看</a>
+										{% else %}
+											已失效
+										{% endifequal %}
+									{% else %}
+										{% ifequal reward.isExchg 1 %}
+											<a href="/myrewards/{{reward.id}}/">查看</a>
+										{% else %}
+											<a href="/getrewards/{{reward.id}}/">领取</a>
+										{% endifequal %}
+									{% endifequal %}
+								{% endifequal %}
+							{% endfor %}
 						</td>
 					</tr>
 				{% endfor %}
@@ -96,6 +114,53 @@
 				<div class="panel-body">
 					{% if not exchanges %}
 						无兑换记录！
+						{% else %}
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>
+							序号
+						</th>
+						<th>
+							兑换日期
+						</th>
+						<th>
+							兑换物品
+						</th>
+						<th>
+							抵扣积分
+						</th>
+						<th>
+							操作
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for exchg in exchanges %}
+					{% if forloop.counter|divisibleby:2 %}
+					<tr class="info">
+					{% else %}
+					<tr class="warning">
+					{% endif %}
+						<td>
+							{{forloop.counter}}
+						</td>
+						<td>
+							{{exchg.exchg_dt|date:"Y-m-d"}}
+						</td>
+						<td>
+							{{exchg.reward}}
+						</td>
+						<td>
+							{{exchg.reward.reward_cost}}
+						</td>
+						<td>
+							<a href="/myrewards/{{exchg.id}}/">查看</a>
+						</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
 					{% endif %}
 				</div>
 			</div>

@@ -1,0 +1,138 @@
+{% extends "index_base.html" %}
+
+{% block js_content %}
+<script>
+$(document).ready(function(){
+    $("#ret").click(function(){
+    	window.location.href="/mycredit/";
+    })
+});
+
+</script>
+{% endblock %}
+
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+		{% if not reward %}
+			<div class="alert alert-dismissable alert-danger">
+				无相关数据!<a href="/mycredit/" class="alert-link">返回</a>
+			</div>
+		{% else %}
+		{% if form.errors %}
+			<div class="alert alert-dismissable alert-danger">
+				 {{form.phone.errors}}
+			</div>
+		{% endif %}
+			<div class="row clearfix">
+				<div class="col-md-3 column">
+				</div>
+				<div class="col-md-6 column">
+							<form action="" method="post">{% csrf_token %}
+								<div class="form-group">
+									<label for="id_username" class="col-sm-3 control-label">
+										{% if showRew %}
+											中奖账号:
+										{% else %}
+											兑换账号:
+										{% endif %}
+									</label>
+									<div class="col-sm-3">
+									{{reward.username}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+									<label for="id_reward" class="col-sm-3 control-label">
+										{% if showRew %}
+											奖品:
+										{% else %}
+											兑换物品:
+										{% endif %}
+									</label>
+									<div class="col-sm-3">
+									{{reward.reward}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+								{% if not showRew %}
+									<label for="id_reward" class="col-sm-3 control-label">
+										抵扣积分
+									</label>
+									<div class="col-sm-3" style="color: red;font-weight:bold;">
+									{{reward.reward.reward_cost}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+								{% endif %}
+								{% if showRew %}
+									<label for="id_reward_dt" class="col-sm-3 control-label">中奖时间:</label>
+									<div class="col-sm-3">
+									{{reward.reward_dt|date:"Y-m-d"}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+									<label for="id_reward_enddt" class="col-sm-3 control-label">失效日期:</label>
+									<div class="col-sm-3" style="color: red;font-weight:bold;">
+									{{reward.reward.reward_enddt|date:"Y-m-d"}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+									<label for="id_name" class="col-sm-3 control-label">领奖人姓名:</label>
+								{% endif %}
+								{% if showRew %}
+									<div class="col-sm-3">
+								{% else %}
+									<div class="col-sm-3" style="display: none;">
+								{% endif %}
+									{{form.name}}
+									</div>
+								{% if showRew %}
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+								{% endif %}
+									<label for="id_phone" class="col-sm-3 control-label">
+										{% if showRew %}
+											领奖人手机:
+										{% else %}
+											兑换人手机:
+										{% endif %}
+									</label>
+									<div class="col-sm-3">
+									{{form.phone}}
+									</div>
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+								{% if showRew %}
+									<label for="id_addr" class="col-sm-3 control-label">领奖人地址:</label>
+								{% endif %}
+								{% if showRew %}
+									<div class="col-sm-3">
+								{% else %}
+									<div class="col-sm-3" style="display: none;">
+								{% endif %}
+									{{form.addr}}
+									</div>
+								{% if showRew %}
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+									<label for="id_addrcod" class="col-sm-3 control-label">领奖人邮编:</label>
+								{% endif %}
+								{% if showRew %}
+									<div class="col-sm-3">
+								{% else %}
+									<div class="col-sm-3" style="display: none;">
+								{% endif %}
+									{{form.addrcod}}
+									</div>
+								{% if showRew %}
+									<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="80%" color=#987cb9 SIZE=3></HR>
+								{% endif %}
+								
+								</div>
+								<div><p style="color: Red">* 信息一旦提交将无法修改，请确保填写正确</p></div>
+								<div>
+									<button type="submit" class="btn btn-default btn-info" id="com">提交</button>
+									<button type="button" class="btn btn-default btn-info" id="ret">返回</button>
+								</div>
+
+							</form>
+				</div>
+			</div>
+		{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock %}

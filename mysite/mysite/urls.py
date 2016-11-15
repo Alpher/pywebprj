@@ -34,4 +34,5 @@ urlpatterns = [
     url(r'^pwdchanged/$',pwdchanged),
     url(r'^mycredit/$',checkcredit),
     url(r'^myrewards/(\d{1,2})/$',checkreward),
-] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    url(r'^getrewards/(\d{1,2})/$',getreward),
+]

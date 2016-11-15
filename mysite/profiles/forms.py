@@ -4,7 +4,7 @@ __author__ = 'Alpher'
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from profiles.models import Region
-
+import re
 
 #从数据库参数表中获取地区列表
 def getProv():
@@ -22,6 +22,7 @@ class ModifyUserForm(forms.Form):
                                    choices=((u'1', u'男'), (u'2', u'女'), ),   
                                    widget=forms.RadioSelect())
 	birth=forms.DateField(label=u'生日:',widget=SelectDateWidget(years=tuple([i for i in xrange(1966,1997)])))
+	#region=forms.ChoiceField(label=u'地区:',choices=((u'1',u'广东'),))
 	region=forms.ChoiceField(label=u'地区:',choices=getProv())
 	phone=forms.CharField(max_length=11,required=False,label='手机:')
 	
@@ -35,8 +36,14 @@ class ModifyUserForm(forms.Form):
 	def clean_phone(self):
 		phone = self.cleaned_data['phone']
 		num_words = len(phone)
+
+		ph = re.compile('^0\d{2,3}\d{7,8}$|^1[358]\d{9}$|^147\d{8}')
+
 		if (phone <> None and phone <> '') and num_words < 11:
 			raise forms.ValidationError("手机号码必须为11位!")
+		elif num_words == 11:
+			if not ph.match(phone):
+				raise forms.ValidationError(u'手机号码校验失败!')
 		return phone
 
 #密码修改表单

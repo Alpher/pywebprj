@@ -1,0 +1,15 @@
+{% extends "index_base.html" %}
+
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="alert alert-dismissable alert-danger">
+				<h4>
+					出错啦!
+				</h4> <strong>{{error_info_strong}}</strong> {{error_tips}} <a href="{{error_return_link}}" class="alert-link">{{error_return_link_lable}}</a>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
