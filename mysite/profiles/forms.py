@@ -70,3 +70,9 @@ class ChangPwdForm(forms.Form):
 		elif newpwd <> confnewpwd:
 			raise forms.ValidationError(u'两次输入的密码不一致!')
 		return confnewpwd
+
+#用户头像表单
+# class AvatarForm(forms.Form):
+# 	"""用户头像上传表单"""
+# 	avatar = forms.ImageField()
+

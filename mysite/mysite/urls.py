@@ -35,4 +35,6 @@ urlpatterns = [
     url(r'^mycredit/$',checkcredit),
     url(r'^myrewards/(\d{1,2})/$',checkreward),
     url(r'^getrewards/(\d{1,2})/$',getreward),
+    url(r'^changeavatar/$',changeavatar),
+    url(r'^saveavatar/$',saveavatar),
 ]

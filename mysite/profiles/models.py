@@ -7,7 +7,8 @@ from django.db import models
 
 from django.contrib.auth.models import User  
 from django.contrib.auth.admin import UserAdmin  
-import datetime
+import datetime,os
+from mysite import settings
 
 class AcctType(models.Model):
     """账号类型定义"""
@@ -84,3 +85,4 @@ class ExtraInfo(ProfileUser):
     acct_type = models.ForeignKey(AcctType, verbose_name=u'账号类型', default=1)
     status = models.ForeignKey(AcctStatus, verbose_name=u'账号状态', default=1)
     phone= models.CharField(max_length = 20, verbose_name=u'手机', null=True, blank=True) 
+    avatar = models.ImageField(verbose_name=u'头像',upload_to='static/images/useravatars/',default=r'/static/images/useravatars/default.jpg')

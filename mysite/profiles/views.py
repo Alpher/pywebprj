@@ -4,8 +4,13 @@ __author__ = 'Alpher'
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse,HttpResponseServerError
 from profiles.forms import *
+import os
+from mysite import settings
+from PIL import Image
+import base64
+# from django.http import Http404
 #from django.http import HttpResponse
 
 # Create your views here.
@@ -102,3 +107,37 @@ def changepwd(request):
 def pwdchanged(request):
 	showname=u'匿名'
 	return render(request,'pwdchanged.html',locals())
+
+def changeavatar(request):
+	user=User.objects.get(username=request.user.username)
+	isStaff=user.is_staff
+	showname=getName(request)
+	username=request.user.username
+	useravatar = r'/'+str(user.avatar)
+
+	return render(request, 'avatar.html', locals())
+
+def saveavatar(request):
+	#ajax异步保存头像
+	if request.method == 'POST' and request.is_ajax():
+		data = request.POST
+		img = data['avatarimg']
+		#去除编码前面的字符串
+		imgData=base64.b64decode(img[img.index(',')+1:])
+		
+		imgfname = request.user.username+'_avatar.jpg'
+		dest = os.path.join(settings.STATICFILES_DIRS[0],'images','useravatars', imgfname)
+		try:
+			with open(dest, "wb") as destination:
+				destination.write(imgData)
+			user=User.objects.get(username=request.user.username)
+			user.avatar = settings.STATIC_URL[1:]+'images/useravatars/'+imgfname
+			user.save(update_fields=['avatar'])
+			return HttpResponse("success")
+		except Exception as e:
+			return HttpResponseServerError()
+	else:
+		error_return_link_lable = u'返回'
+		error_return_link = r'/changeavatar/'
+		error_info_strong = u'无效访问!'
+		return render(request,'innerror.html',locals())

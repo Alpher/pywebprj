@@ -1,0 +1,143 @@
+{% extends "index_base.html" %}
+
+{% block js_content %}
+<script src="/static/js/cropbox.js"></script>
+
+{% endblock %}
+
+{% block middle_area %}
+<link rel="stylesheet" href="/static/css/avatar_cut_style.css" type="text/css" />
+
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="row clearfix">
+				<div class="col-md-2 column">
+					<div><strong>当前头像</strong></div>
+					<div id="useravatar">
+						<img src="{{useravatar}}" alt="无法显示头像" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" >
+					</div>
+					<input type="hidden" id="username" value="{{username}}"></input>
+				</div>
+				<div class="col-md-6 column">
+<div class="acontainer">
+  <div class="imageBox">
+    <div class="thumbBox"></div>
+    <div class="spinner" style="display: none">Loading...</div>
+  </div>
+  <div class="action"> 
+    <!-- <input type="file" id="file" style=" width: 200px">-->
+    <div class="new-contentarea tc"> <a href="javascript:void(0)" class="upload-img">
+      <label for="upload-file">上传图像</label>
+      </a>
+      <input type="file" class="" name="upload-file" id="upload-file" />
+    </div>
+    <input type="button" id="smtAvatar"  class="Btnsty_peyton" value="保存">{% csrf_token %}
+    <input type="button" id="btnCrop"  class="Btnsty_peyton" value="预览">
+<!--     <input type="button" id="btnZoomIn" class="Btnsty_peyton" value="+"  >
+    <input type="button" id="btnZoomOut" class="Btnsty_peyton" value="-" > -->
+  </div>
+  <div class="cropped"></div>
+</div>
+<script type="text/javascript">
+function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings){ 
+
+          xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));              
+      }
+    });
+
+$(window).load(function() {
+	var options =
+	{
+		thumbBox: '.thumbBox',
+		spinner: '.spinner',
+		imgSrc: '/static/images/useravatars/avatar.png'
+	}
+	var cropper = $('.imageBox').cropbox(options);
+	$('#upload-file').on('change', function(){
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			options.imgSrc = e.target.result;
+			cropper = $('.imageBox').cropbox(options);
+		}
+		reader.readAsDataURL(this.files[0]);
+		this.files = [];
+	})
+	$('#btnCrop').on('click', function(){
+		var img = cropper.getDataURL();
+		if ($('#upload-file').val()=='')
+			alert("请先上传图像");
+		else{
+			$('.cropped').html('');
+			$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
+			$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+			$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+		}
+	})
+	$('#smtAvatar').on('click', function(){
+		if ($('#upload-file').val()=="")
+			alert("请先上传图像");
+		else{
+				var img = cropper.getDataURL();
+        		// var postdata={
+        		//     "avatarimg":img,
+        		// };
+        		// jQuery.post('/saveavatar/',postdata,function(data, textStatus, jqXHR){
+        		// 	alert(textStatus);
+        		// });
+				$.ajax({
+				 type:'POST',
+				 url:'/saveavatar/',
+				 dataType:'text',
+				 data:{"avatarimg":img,},
+				 success:function(data)
+				  {
+				   // var userid=$("#username").val();
+				   $("#useravatar").html('')
+				   $("#useravatar").append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" >');
+				   alert("保存成功");
+				  },
+				 error:function(data)
+				 {
+				  alert("保存失败，请重试"); 
+				 }
+				});
+        	}
+	})
+	$('#btnZoomIn').on('click', function(){
+		cropper.zoomIn();
+	})
+	$('#btnZoomOut').on('click', function(){
+		cropper.zoomOut();
+	})
+});
+</script>
+				</div>
+				<div class="col-md-4 column">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+{% endblock %}
