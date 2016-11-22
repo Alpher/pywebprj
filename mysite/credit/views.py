@@ -26,11 +26,11 @@ def checkcredit(request):
 	isOvdict = {}
 
 	#中奖记录列表
-	rewards=MyRewards.objects.filter(username=request.user.username,reward__action_type=ACTIONTYPEOFREWARD)
+	rewards=MyRewards.objects.filter(username=request.user.username,reward__action_type__actiontype_code=ACTIONTYPEOFREWARD)
 	#rewards=MyRewards.objects.filter(username=request.user.username)
 
 	#兑换记录列表
-	exchanges = MyRewards.objects.filter(username=request.user.username).exclude(reward__action_type=ACTIONTYPEOFREWARD)
+	exchanges = MyRewards.objects.filter(username=request.user.username).exclude(reward__action_type__actiontype_code=ACTIONTYPEOFREWARD)
 
 	for rec in rewards:
 		if rec.reward.reward_enddt.strftime("%Y-%m-%d") < cur_dt:
@@ -113,7 +113,7 @@ def getreward(request,reward_id):
 			reward.exchg_addr = cd['addr']
 			reward.addr_code = cd['addrcod']
 
-			#虚拟物品
+			#虚拟物品,当前只支持话费卡自动获取卡密
 			if not showRew:
 				lockedcard = ''
 				islocked = False

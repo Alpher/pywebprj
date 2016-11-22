@@ -108,6 +108,7 @@ def pwdchanged(request):
 	showname=u'匿名'
 	return render(request,'pwdchanged.html',locals())
 
+@login_required
 def changeavatar(request):
 	user=User.objects.get(username=request.user.username)
 	isStaff=user.is_staff
@@ -117,6 +118,7 @@ def changeavatar(request):
 
 	return render(request, 'avatar.html', locals())
 
+@login_required
 def saveavatar(request):
 	#ajax异步保存头像
 	if request.method == 'POST' and request.is_ajax():

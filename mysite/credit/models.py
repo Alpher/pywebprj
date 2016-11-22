@@ -8,7 +8,7 @@ from django.db import models
 # Create your models here.
 
 #抽奖活动ID
-ACTIONTYPEOFREWARD = 2
+ACTIONTYPEOFREWARD = '2'
 
 #实物
 TYPEOFACTUALREW = 'A001'
