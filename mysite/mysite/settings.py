@@ -1,3 +1,8 @@
+#-*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
+__author__ = 'Alpher'
+
 """
 Django settings for mysite project.
 
@@ -40,6 +45,8 @@ INSTALLED_APPS = [
     'profiles',
     'credit',
     'checkin',
+    'community',
+    'el_pagination',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +76,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
@@ -137,3 +145,26 @@ STATICFILES_DIRS = [
 # MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 #AUTH_PROFILE_MODULE = 'profiles.models.Profile'
+
+
+#self-definition
+
+#抽奖活动类型代码
+ACTIONTYPEOFREWARD = 'A002'
+
+#实物类型代码
+TYPEOFACTUALREW = 'A001'
+
+#操作类型编码 1-签到积分 2-兑换抵扣 3-违规罚扣
+TYPE_OF_CHKIN = 1
+TYPE_OF_EXCHG = 2
+TYPE_OF_VIOLT = 3
+
+#积分加值
+CHKIN_SCORE = 10
+CHKIN_SCORE_PLUS = 15
+
+#社区每页主题数
+EL_PAGINATION_PER_PAGE = 15
+EL_PAGINATION_PREVIOUS_LABEL = u'上一页'
+EL_PAGINATION_NEXT_LABEL = u'下一页'

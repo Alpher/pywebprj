@@ -12,7 +12,7 @@ $(document).ready(function(){
 <div class="container">
 	<div class="row clearfix">
 		<div class="col-md-12 column">
-		{% if showSaveAlert %}
+		{% if not form.nickname.errors and showSaveAlert %}
 			<div id="saveresdiv" class="alert alert-dismissable alert-info">
 				 <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
 				<strong>保存成功!</strong>
@@ -112,6 +112,7 @@ $(document).ready(function(){
 							</h3>
 						</div>
 						<div class="panel-body">
+						<div style="color: Red">
 							{% if form.errors %}
 								{% if form.nickname.errors %}
 									{{form.nickname.errors}}
@@ -119,8 +120,10 @@ $(document).ready(function(){
 									{{form.phone.errors}}
 								{% endif %}
 							{% endif %}
+						</div>
 							<form action="" method="post">{% csrf_token %}
 								<div class="form-group">
+									<div style="display: none;">{{form.username}}</div>
 									<label for="id_nickname" class="col-sm-2 control-label">昵称:</label>
 									<div class="col-sm-10">
 									{{form.nickname}}(*必填,大于4个字符)

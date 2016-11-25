@@ -71,7 +71,7 @@ def saveUserInfo(request):
 			user.save()
 			return HttpResponseRedirect('/myprofile/?saveresult=True')
 	else:
-		form = ModifyUserForm(initial={'nickname':showname,'sex':usersex,'birth':birth,'region':region,'phone':cur_user.phone,'showSaveAlert':showSaveAlert})
+		form = ModifyUserForm(initial={'username':request.user.username,'nickname':showname,'sex':usersex,'birth':birth,'region':region,'phone':cur_user.phone,'showSaveAlert':showSaveAlert})
 	return render(request,'myprofile.html',locals())
 
 def getName(request):
@@ -84,6 +84,9 @@ def getName(request):
 	else:
 		username = request.user.username
 	return username
+
+def getUserAvatarURL(User):
+	return r'/'+str(User.avatar)
 
 @login_required
 def changepwd(request):
@@ -114,7 +117,7 @@ def changeavatar(request):
 	isStaff=user.is_staff
 	showname=getName(request)
 	username=request.user.username
-	useravatar = r'/'+str(user.avatar)
+	useravatar = getUserAvatarURL(user)
 
 	return render(request, 'avatar.html', locals())
 
@@ -143,3 +146,18 @@ def saveavatar(request):
 		error_return_link = r'/changeavatar/'
 		error_info_strong = u'无效访问!'
 		return render(request,'innerror.html',locals())
+
+#用户基础信息统一接口
+def getUserBase(request):
+	userbase={}
+	user=User.objects.get(username=request.user.username)
+	#是否管理员
+	userbase['isStaff']=user.is_staff
+	#显示账号/昵称
+	userbase['showname'] = getName(request)
+	#用户头像URL
+	userbase['useravatar'] = getUserAvatarURL(user)
+	#账号
+	userbase['username'] = user.username
+
+	return userbase

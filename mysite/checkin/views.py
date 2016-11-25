@@ -11,6 +11,7 @@ from checkin.models import *
 import datetime
 from django.db import transaction
 from django.http import JsonResponse
+from mysite.settings import TYPE_OF_CHKIN,TYPE_OF_EXCHG,TYPE_OF_VIOLT,CHKIN_SCORE,CHKIN_SCORE_PLUS
 
 # Create your views here.
 
@@ -157,7 +158,7 @@ def getchkinov(request):
 					data['top'+str(idx)] = uslog.username
 				data['top'+str(idx)+'ts'] = uslog.update_ts.strftime("%Y-%m-%d %H:%M:%S")
 				idx+=1
-			print data
+			# print data
 			return JsonResponse(data)
 		except Exception as e:
 			print e

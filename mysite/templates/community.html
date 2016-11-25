@@ -1,0 +1,150 @@
+{% extends "index_base.html" %}
+
+{% load el_pagination_tags %}
+
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						社区公告
+					</h3>
+				</div>
+				<div class="panel-body">
+					<blockquote>
+						<p>
+							{% if announce %}
+								{{announce.anncm}}
+				    		{% else %}
+				    			暂无公告
+				    		{% endif %}
+						</p> 
+						<small>{{showname}} <cite>{{announce.update_ts|date:"Y-m-d H:i:s"}}</cite></small>
+					</blockquote>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="tabbable" id="tabs-410006">
+				<ul class="nav nav-tabs">
+					<li class="active">
+						 <a href="#panel-893184" data-toggle="tab">闲聊区</a>
+					</li>
+					<li>
+						 <a href="#panel-166653" data-toggle="tab">提问区</a>
+					</li>
+					<li>
+						 <a href="#panel-166654" data-toggle="tab">反馈区</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="panel-893184">
+					<div class="col-md-12 column">
+						<button type="button" class="btn btn-default btn-primary pull-right">发布新主题</button>
+					</div>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>
+									主题
+								</th>
+								<th>
+									发布
+								</th>
+								<th>
+									时间
+								</th>
+								<th>
+									浏览数
+								</th>
+								<th>
+									评论数
+								</th>
+								<th>
+									最近回复
+								</th>
+								<th>
+									最近时间
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% paginate cbbslist %}
+							{% for cbbs in cbbslist %}
+								{% if forloop.counter|divisibleby:2 %}
+									<tr>
+								{% else %}
+									<tr class="warning">
+								{% endif %}
+									<td class="col-md-4">
+										<a href=""><strong>[{{cbbs.cbbsctgy}}]</strong>{{cbbs.title}}</a>
+									</td>
+									<td class="col-md-1">
+										{{cbbs.username}}
+									</td>
+									<td class="col-md-2">
+										{{cbbs.create_ts|date:"Y-m-d H:i:s"}}
+									</td>
+									<td class="col-md-1">
+										{{cbbs.viewers}}
+									</td>
+									<td class="col-md-1">
+										{{cbbs.comnts}}
+									</td>
+									<td class="col-md-1">
+										test
+									</td>
+									<td class="col-md-2">
+										test11
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+			</table>
+			{% get_pages %}
+			<div>
+				当前第{{ pages.current }}页，共<strong>{{ pages|length }}</strong>页
+			</div>
+			<ul class="pagination">
+			
+				<li>
+					{{ pages.previous }}
+				</li>
+				{% for page in pages %}
+				<li>
+					<a href="{{ page.path }}">
+					{% if page.is_current %}
+					 <strong>{{ page.label }}</strong>
+					{% else %}
+					 {{ page.label }}
+					{% endif %}
+					</a>
+				</li>
+				{% endfor %}
+				<li>
+					{{ pages.next }}
+				</li>
+
+			</ul>
+					</div>
+					<div class="tab-pane" id="panel-166653">
+						<p>
+							Howdy, I'm in Section 2.
+						</p>
+					</div>
+					<div class="tab-pane" id="panel-166654">
+						<p>
+							Howdy, I'm in Section 3.
+						</p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+{% endblock %}

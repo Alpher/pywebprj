@@ -1,5 +1,9 @@
 WebSite source V1.0
 
+2016-11-23
+1.添加昵称唯一校验，将model相关自定义选项移到settings中
+2.新增社区页面,集成django-el-pagination分页功能(更新中)
+
 2016-11-22
 1.新增签到功能
 

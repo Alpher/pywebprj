@@ -5,6 +5,7 @@ from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from profiles.models import Region
 import re
+from django.contrib.auth.models import User
 
 #从数据库参数表中获取地区列表
 def getProv():
@@ -17,6 +18,7 @@ def getProv():
 #账户资料修改表单
 class ModifyUserForm(forms.Form):
 	"""账户资料修改表单"""
+	username = forms.CharField(max_length=50,label=u'账号:')
 	nickname = forms.CharField(max_length=100,label=u'昵称:')
 	sex=forms.ChoiceField(label=u'性别:',   
                                    choices=((u'1', u'男'), (u'2', u'女'), ),   
@@ -26,11 +28,24 @@ class ModifyUserForm(forms.Form):
 	region=forms.ChoiceField(label=u'地区:',choices=getProv())
 	phone=forms.CharField(max_length=11,required=False,label='手机:')
 	
+	#当前账号
+	CurUser = ''
+
+	def clean_username(self):
+		self.CurUser = self.cleaned_data['username']
+	
 	def clean_nickname(self):
 		nickname = self.cleaned_data['nickname']
 		num_words = len(nickname)
+
 		if num_words < 4:
 			raise forms.ValidationError("昵称必须超过4个字符!")
+		else:
+			users=User.objects.filter(nickname=nickname)
+			if users:
+				if users[0].username<>self.CurUser:
+					print users[0].username+'-'+self.CurUser
+					raise forms.ValidationError("昵称已经被占用!")
 		return nickname
 
 	def clean_phone(self):

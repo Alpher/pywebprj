@@ -7,15 +7,6 @@ from django.db import models
 
 # Create your models here.
 
-#操作类型编码 1-签到积分 2-兑换抵扣 3-违规罚扣
-TYPE_OF_CHKIN = 1
-TYPE_OF_EXCHG = 2
-TYPE_OF_VIOLT = 3
-
-#积分加值
-CHKIN_SCORE = 10
-CHKIN_SCORE_PLUS = 15
-
 class UScoreOpType(models.Model):
 	"""用户积分操作类型"""
 	type_code = models.CharField(verbose_name=u'操作类型编码', max_length=50)

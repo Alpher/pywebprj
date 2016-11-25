@@ -6,11 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from profiles.views import getName
-from credit.models import MyRewards,ACTIONTYPEOFREWARD,Rewards,TYPEOFACTUALREW,Ecards,PhoneNumType
+from credit.models import MyRewards,Rewards,Ecards,PhoneNumType
 from django.http import Http404
 from credit.forms import GetRewardForm
 from django.db import transaction
 import datetime,time
+from mysite.settings import ACTIONTYPEOFREWARD,TYPEOFACTUALREW
 # Create your views here.
 
 

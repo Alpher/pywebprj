@@ -7,12 +7,6 @@ from django.db import models
 
 # Create your models here.
 
-#抽奖活动ID
-ACTIONTYPEOFREWARD = '2'
-
-#实物
-TYPEOFACTUALREW = 'A001'
-
 class EcardType(models.Model):
 	"""卡品类型模型"""
 	ecardtype_code = models.CharField(verbose_name=u'卡品类型编码', max_length=50)
