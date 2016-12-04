@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'checkin',
     'community',
     'el_pagination',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -120,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-cn'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -140,9 +142,33 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-# MEDIA_URL = '/media/'
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': (
+            #['div','Source','-','Save','NewPage','Preview','-','Templates'], 
+            ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print','SpellChecker','Scayt'], 
+            #['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'], 
+            #['Form','Checkbox','Radio','TextField','Textarea','Select','Button', 'ImageButton','HiddenField'], 
+            ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'], 
+            ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'], 
+            ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'], 
+            #['Link','Unlink','Anchor'], 
+            ['Image','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'], #'Flash'
+            ['Styles','Format','Font','FontSize'], 
+            ['TextColor','BGColor'], 
+            # ['Maximize','ShowBlocks','-','About', 'pbckcode'],
+        ),
+        'width': '100%',
+    }
+}
 
-# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "static","images")
+
+CKEDITOR_UPLOAD_PATH = "article_images/"
 
 #AUTH_PROFILE_MODULE = 'profiles.models.Profile'
 
@@ -163,6 +189,10 @@ TYPE_OF_VIOLT = 3
 #积分加值
 CHKIN_SCORE = 10
 CHKIN_SCORE_PLUS = 15
+
+#社区主题上传图片最大尺寸(像素)
+IMGWIDTH = 600
+IMGHEIGHT = 450
 
 #社区每页主题数
 EL_PAGINATION_PER_PAGE = 15

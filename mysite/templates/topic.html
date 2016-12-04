@@ -1,0 +1,319 @@
+{% extends "index_base.html" %}
+{% load el_pagination_tags %}
+{% load mytags %}
+{% block js_content %}
+<script src="/static/js/js.cookie.js"></script>
+    <script>
+        $(document).ready(function(){
+        	$('#id_return').click(function(){
+        		var lctgyidx = $('#id_return_ctgyidx').val();
+        		Cookies.set('curtabidx',lctgyidx);
+        		location.href = '/community/';
+        	});
+
+        	$('.cmnt_of_cmnt_form').hide();
+
+        	$('.rply_btn').click(function(){
+        		$('.cmnt_of_cmnt_form').hide();
+        		$(this).parent().children('.cmnt_of_cmnt_form').show();
+        	});
+
+        	$('.smit_cmtofcmt').click(function(){
+        		var lcmtofcmt = $(this).parent().children('.rply').val();
+        		var topicid = $('#id_topicid').val();
+        		var lcmntid = $(this).parent().children('.hidden_cmntid').val();
+
+        		$(this).parent().children('.smit_cmtofcmt_error').html("");
+        		if(lcmtofcmt.length<4){
+        			$(this).parent().children('.smit_cmtofcmt_error').html("回复内容不能少于4个字符!");
+        		}else{
+						$.ajaxSetup({
+                 			data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+            			});
+
+						$.ajax({
+                    			type:"POST",
+                    			data: {topic_id:topicid, comment:lcmtofcmt,cmntid:lcmntid},
+                    			url: "/community/posttpcmt/", //后台处理函数的url 这里用的是static url 需要与urls.py中的name一致
+                    			cache: false,
+                    			dataType: "html",
+                    			success: function(result, statues, xml){
+                    				// alert(result);
+                    				window.location.reload();//刷新当前页面
+                    			},
+                    			error: function(){
+                    			    alert("回复失败，请重试");
+                    			}
+                        });
+        		}
+        	});
+
+        	$('.cncl_cmtofcmt').click(function(){
+        		$(this).parent().children('.rply').val('');
+        		$(this).parents('.cmnt_of_cmnt_form').hide();
+        	});
+
+        	$('#id_submit_tpcomnt').click(function(){
+
+        		var topiccom = $('#id_commnt').val();
+        		var topicid = $('#id_topicid').val();
+
+        		$('#id_commnt_errors').html("");
+
+        		if(topiccom.length<4){
+        			$('#id_commnt_errors').html("回复内容不能少于4个字符!")
+        		}else{
+						$.ajaxSetup({
+                 			data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+            			});
+
+						$.ajax({
+                    			type:"POST",
+                    			data: {topic_id:topicid, comment:topiccom,cmntid:''},
+                    			url: "/community/posttpcmt/", //后台处理函数的url 这里用的是static url 需要与urls.py中的name一致
+                    			cache: false,
+                    			dataType: "html",
+                    			success: function(result, statues, xml){
+                    				// alert(result);
+                    				window.location.reload();//刷新当前页面
+                    			},
+                    			error: function(){
+                    			    alert("回复失败，请重试");
+                    			}
+                        });
+        		}
+   //      		var comhtml = '<div class="panel panel-default">'+
+			// 	'<div class="panel-body">'+
+			// 		'<div style="float: right;">'+
+			// 		'#2'+
+			// 		'</div>'+
+			// 		'<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>'+
+			// 		'<div class="col-md-2 column">'+
+			// 			'<div id="useravatar">'+
+			// 				'<img src="'+
+			// 				'{{useravatar}}'+
+			// 				'" alt="无法显示头像" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" >'+
+			// 			'</div>'+
+			// 			'<p></p>'+
+			// 			'<ul class="list-unstyled">'+
+			// 				'<li>ID:100001</li>'+
+			// 				'<li>账号:user1</li>'+
+			// 			'</ul>'+
+			// 		'</div>'+
+			// 		'<div class="col-md-7 column">'+
+			// 			'<p>'+
+			// 				'Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.'+
+			// 			'</p>'+
+			// 		'</div>'+
+			// 		'<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>'+
+			// 		'<div style="float: right;">'+
+			// 			'<a href="">回复</a>'+
+			// 		'</div>'+
+			// 	'</div>'+
+			// '</div>';
+   //      		$('#id_tp_pnl').after(comhtml);
+        	});
+
+        	});
+    </script>
+{% endblock %}
+{% block middle_area %}
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="modal fade" id="id_mdl_rply_tp" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								回复主题
+							</h4>
+						</div>
+						<div class="modal-body">
+							<form id="comntform" class="form-horizontal" role="form" method="post">{% csrf_token %}
+								<div class="form-group">
+									<label for="inputText" class="col-sm-2 control-label">内容:</label>
+									<div class="col-sm-10">
+										<textarea class="col-sm-10" id="id_commnt"></textarea>
+										<input type="hidden" id="id_topicid" value="{{topic_id}}" />
+									<div id="id_commnt_errors" class="col-sm-10" style="color: Red">
+									</div>
+									</div>
+
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							 <button type="button" class="btn btn-primary" id="id_submit_tpcomnt">保存</button>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+			
+		</div>
+		<div class="col-md-1 column">
+		</div>
+		<div class="col-md-9 column">
+			<div>
+        		<button type="button" class="btn btn-default btn-sm" id="id_return">
+        		  <span class="glyphicon glyphicon-home"></span> {{ctgy}}
+        		</button>
+        		<input type="hidden" id="id_return_ctgyidx" value="{{ctgyidx}}" />
+        		<p></p>
+			</div>
+			<div class="panel panel-info" id="id_tp_pnl">
+				<div class="panel-body">
+					<div style="float: left;"><strong>{{topic_title}}</strong></div>
+					<div style="float: right;">楼主</div>
+					<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>
+					<div class="col-md-2 column">
+						<div id="useravatar">
+							<img src="{{topic_useravatar}}" alt="无法显示头像" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" >
+						</div>
+						<p></p>
+						<ul class="list-unstyled">
+							<li>ID:{{topic_userid}}</li>
+							<li>昵称:{{topic_showname}}</li>
+						</ul>
+					</div>
+					<div class="col-md-7 column">
+						<p class="text-left">
+							<h5>
+								0 <span class="glyphicon glyphicon-eye-open"></span>
+								0 <span class="glyphicon glyphicon-comment"></span>
+								<small>{{topic_create_ts|date:"Y-m-d H:i:s"}}</small>
+							</h5>
+						</p>
+						<p>
+							{{topic_content|safe}}
+						</p>
+					</div>
+					<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>
+					<div style="float: right;">
+						<a id="id_rply" href="#id_mdl_rply_tp" role="button" class="btn" data-toggle="modal">回复</a>
+						<!-- <a id="id_rply_tp">回复</a> -->
+					</div>
+				</div>
+			</div>
+			<!-- 评论区 -->
+			<div>
+			{% if comments %}
+				{% paginate 10 comments %}
+				{% for comment in comments %}
+					<div class="panel panel-danger">
+						<div class="panel-body">
+							<div style="float: right;">#{{comment.id}}</div>
+							<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>
+							<div class="col-md-2 column">
+								<div id="useravatar">
+									<img src="{{comment.username|showavatar}}" alt="无法显示头像" align="absmiddle" style="width:64px;margin-top:4px;		border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" >
+								</div>
+								<p></p>
+								<ul class="list-unstyled">
+									<li>ID:{{comment.username|showuserid}}</li>
+									<li>昵称:{{comment.username|showname}}</li>
+								</ul>
+							</div>
+							<div class="col-md-7 column">
+								<h5>
+									0 <span class="glyphicon glyphicon-thumbs-up"></span>
+									0 <span class="glyphicon glyphicon-thumbs-down"></span>
+									<small>{{comment.create_ts|date:"Y-m-d H:i:s"}}</small>
+								</h5>
+								<p>
+								{{comment.id|showreplies|safe}}
+								</p>
+								<p>
+									{{comment.comment}}
+								</p>
+							</div>
+							<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>
+							<!-- <div class="col-md-9 column"> -->
+							<div>
+								<button type="button" class="btn btn-default btn-link rply_btn" style="float: right;">回复</button>
+								<div class="cmnt_of_cmnt_form">
+									<form class="form-horizontal" role="form" method="post">{% csrf_token %}
+										<div class="form-group">
+											 <label for="inputEmail3" class="col-sm-3 control-label">回复 {{comment.username|showname}}</label>
+											<div class="col-sm-6">
+												<!-- <input type="text" class="form-control rply"  /> -->
+												<textarea class="form-control rply"></textarea>
+												<p class="smit_cmtofcmt_error" style="color: Red"></p>
+												<input type="hidden" class="hidden_cmntid" value="{{comment.id}}"/>
+												<button type="button" class="btn btn-default btn-info smit_cmtofcmt">提交</button>
+												<button type="button" class="btn btn-default btn-info cncl_cmtofcmt">取消</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+								
+							<!-- </div> -->
+						</div>
+				</div>
+				{% endfor %}
+				{% get_pages %}
+				<div>
+					当前第{{ pages.current }}页，共<strong>{{ pages|length }}</strong>页
+				</div>
+				<ul class="pagination">
+				
+					<li>
+						{{ pages.previous }}
+					</li>
+					{% for page in pages %}
+					<li>
+						<a href="{{ page.path }}">
+						{% if page.is_current %}
+						 <strong>{{ page.label }}</strong>
+						{% else %}
+						 {{ page.label }}
+						{% endif %}
+						</a>
+					</li>
+					{% endfor %}
+					<li>
+						{{ pages.next }}
+					</li>
+	
+				</ul>
+			{% else %}
+				<p class="text-info">暂无回复，还不赶紧说两句~~</p>
+			{% endif %}
+			</div>
+			<!-- 评论区 end -->			
+<!-- 			<div class="panel panel-default">
+				<div class="panel-body">
+					<div style="float: right;">#2</div>
+					<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>
+					<div class="col-md-2 column">
+						<div id="useravatar">
+							<img src="{{useravatar}}" alt="无法显示头像" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" >
+						</div>
+						<p></p>
+						<ul class="list-unstyled">
+							<li>ID:100001</li>
+							<li>账号:user1</li>
+						</ul>
+					</div>
+					<div class="col-md-7 column">
+						<p>
+							Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+						</p>
+					</div>
+					<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=1)" width="100%" color=#987cb9 SIZE=3></HR>
+					<div style="float: right;">
+						<a href="">回复</a>
+					</div>
+				</div>
+			</div> -->
+		</div>
+		<div class="col-md-2 column">
+		</div>
+	</div>
+</div>
+{% endblock %}

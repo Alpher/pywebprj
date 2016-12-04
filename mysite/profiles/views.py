@@ -85,6 +85,17 @@ def getName(request):
 		username = request.user.username
 	return username
 
+def getNameByUn(usrnam):
+	"""页面用户名/昵称显示"""
+	cur_user=User.objects.get(username=usrnam)
+	nickname=cur_user.nickname
+	#如果设置了昵称，则显示昵称，否则显示账号
+	if nickname <> None and nickname <> '':
+		username = nickname
+	else:
+		username = str(usrnam)
+	return username
+
 def getUserAvatarURL(User):
 	return r'/'+str(User.avatar)
 
@@ -159,5 +170,7 @@ def getUserBase(request):
 	userbase['useravatar'] = getUserAvatarURL(user)
 	#账号
 	userbase['username'] = user.username
+	#用户ID
+	userbase['userid'] = user.id
 
 	return userbase

@@ -43,4 +43,5 @@ urlpatterns = [
     url(r'^getchkinday/$',getchkinday),
     url(r'^getchkinov/$',getchkinov),
     url(r'^community/',include('community.urls')),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 ]

@@ -1,15 +1,174 @@
 {% extends "index_base.html" %}
-
+{% load mytags %}
 {% load el_pagination_tags %}
+{% block js_content %}
+<script type="text/javascript" src="/static/ckeditor/ckeditor/ckeditor.js"></script>
+<script src="/static/js/js.cookie.js"></script>
+    <script>
+        $(document).ready(function(){
+        	//从cookies中读取区域
+        	if (Cookies.get('curtabidx')==undefined){
+        		$('#mytabs li:eq(0) a').tab('show');
+        	}else{
+        		$('#mytabs li:eq('+Cookies.get('curtabidx')+') a').tab('show');
+        	};
 
+        	$('.mytabsaction').click(function(){
+        		var tabid = $(this).attr('href');
+        		if(tabid=="#panel-166654"){
+        			Cookies.set('curtabidx','2')
+        		}else if(tabid=="#panel-166653"){
+        			Cookies.set('curtabidx','1')
+        		}else{
+        			Cookies.set('curtabidx','0')
+        		}
+        	});
+
+        	$('#postxl').click(function(){
+        		$('#myModalLabel').html("闲聊区-发布新主题");
+        		$('#id_ctgy').val("1");
+        	});
+        	$('#postxl2').click(function(){
+        		$('#myModalLabel').html("提问区-发布新主题");
+        		$('#id_ctgy').val("2");
+        	});
+        	$('#postxl3').click(function(){
+        		$('#myModalLabel').html("反馈区-发布新主题");
+        		$('#id_ctgy').val("3");
+        	});
+            $('#submitform').click(function(){
+            	//var ltitle = $('#id_title').val();
+            	$('#titlewan').html("");
+            	$('#contentwan').html("");
+
+            	var ltitle = $('#id_title').val();
+            	var lctgy = $('#id_ctgy').val();
+            	var ltopicctgy = $('#id_topicctgy').val();
+				var htmlStr = CKEDITOR.instances.contenteditor.getData();
+				var len = 0;
+				//处理pre
+				var pres = htmlStr.match(/<pre*.?>(.*?)<\/pre>/g);
+				htmlStr = htmlStr.replace(/<pre*.?>(.*?)<\/pre>/g,"");
+				if(pres)
+				    len += pres.join("").length;
+				len += htmlStr
+				    .replace(/\s+/g," ")               //将多个空字符换成一个空格
+				    .replace(/<br\s*?\/?>/g,".")       //将所有换行符替换成一个字符(不用\n是因为可能会被后面换掉)
+				    .replace(/(<\/p>)/g,".$1")         //为所有段落添加一个字符(或两个字符，自己定)将点放在前面避免影响后面的替换
+				    .replace(/<\/.+?>\s*<[^\/]>/g,"") //去掉所有尾-首相连的HTML标签(包括中间的空字符)
+				    .replace(/<.+?>/g,"")             //去掉剩下的HTML标签
+				    .replace(/&.+?;/g,".")            //转换所有实体为一个字符
+				    .length;
+
+            	if(ltitle.length<4){
+            		$('#titlewan').html("主题不能少于4个字符!");
+            	}else if(len<12){
+            		$('#contentwan').html("内容不能少于10个字符!");
+            	}else{
+            		//ajax提交表单
+						$.ajaxSetup({
+                 			data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+            			});
+
+						$.ajax({
+                    			type:"POST",
+                    			data: {title:ltitle, content:htmlStr,ctgy:lctgy,topicctgy:ltopicctgy},
+                    			url: "posttopic/", //后台处理函数的url 这里用的是static url 需要与urls.py中的name一致
+                    			cache: false,
+                    			dataType: "html",
+                    			success: function(result, statues, xml){
+                    				$("#id_title").val("");
+                    				CKEDITOR.instances.contenteditor.setData("");
+                    				$('#modal-container-431747').modal('toggle');
+                    				Cookies.set('curtabidx', result); //设置cookie,记住当前区域
+                    				window.location.reload();//刷新当前页面
+                    			},
+                    			error: function(){
+                    			    alert("提交失败，请重试");
+                    			}
+                        });
+
+            	};//else end here
+            });
+        });
+    </script>
+{% endblock %}
 {% block middle_area %}
 <div class="container">
 	<div class="row clearfix">
+
+		<div class="col-md-12 column">
+			<div class="modal fade" id="modal-container-431747" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" style="width:70%">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								发布新主题
+							</h4>
+						</div>
+						<div class="modal-body">
+            				<form id="topicform" class="form-horizontal" role="form" method="post">{% csrf_token %}
+            					<input type="hidden" id="id_ctgy" />
+								<div class="form-group">
+									 <label for="inputText" class="col-sm-2 control-label">类型</label>
+									<div class="col-sm-10">
+										<select id="id_topicctgy">
+											<option value="1">普通</option>
+											<option value="2">求助</option>
+											<option value="3">悬赏</option>
+											<option value="4">BUG</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									 <label for="inputText" class="col-sm-2 control-label">主题</label>
+									<div class="col-sm-10">
+										<input class="col-sm-10" type="text" id="id_title" />
+									</div>
+									<div id="titlewan" style="color: Red" class="col-sm-10"></div>
+								</div>
+								<div class="form-group">
+									 <label for="inputText" class="col-sm-2 control-label">内容</label>
+									<div class="col-sm-10">
+										<textarea name="contenteditor"></textarea>
+										<script type="text/javascript">
+											CKEDITOR.replace("contenteditor",{
+												toolbar : 'Full',
+												toolbar_Full : [
+    															   ['Preview'],
+    															   ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print','SpellChecker','Scayt'], 
+            														['Bold','Italic','Underline','Strike','-','Subscript','Superscript'], 
+            														['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'], 
+            														['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'], 
+            														['Image','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'], 
+            														['Styles','Format','Font','FontSize'], 
+            														['TextColor','BGColor']
+    																													]
+											});
+										</script>
+										<div id="contentwan" style="color: Red" class="col-sm-10"></div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+								<button type="button" id="submitform" class="btn btn-primary">提交</button>
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+			
+		</div>
+
 		<div class="col-md-12 column">
 			<div class="panel panel-info">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						社区公告
+					<span class="glyphicon glyphicon-pushpin"></span> 社区公告
 					</h3>
 				</div>
 				<div class="panel-body">
@@ -17,11 +176,13 @@
 						<p>
 							{% if announce %}
 								{{announce.anncm}}
+								<p>
+									<small>{{announce.username|showname}} <cite>{{announce.update_ts|date:"Y-m-d H:i:s"}}</cite></small>
+								</p>
 				    		{% else %}
 				    			暂无公告
 				    		{% endif %}
-						</p> 
-						<small>{{showname}} <cite>{{announce.update_ts|date:"Y-m-d H:i:s"}}</cite></small>
+						</p>
 					</blockquote>
 				</div>
 			</div>
@@ -30,21 +191,23 @@
 	<div class="row clearfix">
 		<div class="col-md-12 column">
 			<div class="tabbable" id="tabs-410006">
-				<ul class="nav nav-tabs">
-					<li class="active">
-						 <a href="#panel-893184" data-toggle="tab">闲聊区</a>
+				<ul class="nav nav-tabs" id="mytabs">
+					<li id="xltab">
+						 <a class="mytabsaction" href="#panel-893184" data-toggle="tab">闲聊区</a>
 					</li>
-					<li>
-						 <a href="#panel-166653" data-toggle="tab">提问区</a>
+					<li id="twtab">
+						 <a class="mytabsaction" href="#panel-166653" data-toggle="tab">提问区</a>
 					</li>
-					<li>
-						 <a href="#panel-166654" data-toggle="tab">反馈区</a>
+					<li id="fktab">
+						 <a class="mytabsaction" href="#panel-166654" data-toggle="tab">反馈区</a>
 					</li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="panel-893184">
+					<!-- section 1 -->
 					<div class="col-md-12 column">
-						<button type="button" class="btn btn-default btn-primary pull-right">发布新主题</button>
+						<!-- <button type="button" class="btn btn-default btn-primary pull-right">发布新主题</button> -->
+						<a id="postxl" href="#modal-container-431747" role="button" class="btn btn-default btn-primary pull-right" data-toggle="modal">发布新主题</a>
 					</div>
 					<table class="table table-hover">
 						<thead>
@@ -81,19 +244,20 @@
 									<tr class="warning">
 								{% endif %}
 									<td class="col-md-4">
-										<a href=""><strong>[{{cbbs.cbbsctgy}}]</strong>{{cbbs.title}}</a>
+										<span class="glyphicon glyphicon-edit"></span>
+										<a href="topic/{{cbbs.id}}/"><strong>[{{cbbs.cbbsctgy}}]</strong>{{cbbs.title}}</a>
 									</td>
 									<td class="col-md-1">
-										{{cbbs.username}}
+										{{cbbs.username|showname}}
 									</td>
 									<td class="col-md-2">
 										{{cbbs.create_ts|date:"Y-m-d H:i:s"}}
 									</td>
 									<td class="col-md-1">
-										{{cbbs.viewers}}
+										{{cbbs.viewers}} <span class="glyphicon glyphicon-eye-open"></span>
 									</td>
 									<td class="col-md-1">
-										{{cbbs.comnts}}
+										{{cbbs.comnts}} <span class="glyphicon glyphicon-comment"></span>
 									</td>
 									<td class="col-md-1">
 										test
@@ -132,14 +296,188 @@
 			</ul>
 					</div>
 					<div class="tab-pane" id="panel-166653">
-						<p>
-							Howdy, I'm in Section 2.
-						</p>
+					<!-- section 2 -->
+					<div class="col-md-12 column">
+						<!-- <button type="button" class="btn btn-default btn-primary pull-right">发布新主题</button> -->
+						<a id="postxl2" href="#modal-container-431747" role="button" class="btn btn-default btn-primary pull-right" data-toggle="modal">发布新主题</a>
+					</div>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>
+									主题
+								</th>
+								<th>
+									发布
+								</th>
+								<th>
+									时间
+								</th>
+								<th>
+									浏览数
+								</th>
+								<th>
+									评论数
+								</th>
+								<th>
+									最近回复
+								</th>
+								<th>
+									最近时间
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% paginate cbbslist2 using "twlist" %}
+							{% for cbbs in cbbslist2 %}
+								{% if forloop.counter|divisibleby:2 %}
+									<tr>
+								{% else %}
+									<tr class="warning">
+								{% endif %}
+									<td class="col-md-4">
+										<span class="glyphicon glyphicon-edit"></span>
+										<a href="topic/{{cbbs.id}}/"><strong>[{{cbbs.cbbsctgy}}]</strong>{{cbbs.title}}</a>
+									</td>
+									<td class="col-md-1">
+										{{cbbs.username|showname}}
+									</td>
+									<td class="col-md-2">
+										{{cbbs.create_ts|date:"Y-m-d H:i:s"}}
+									</td>
+									<td class="col-md-1">
+										{{cbbs.viewers}} <span class="glyphicon glyphicon-eye-open"></span>
+									</td>
+									<td class="col-md-1">
+										{{cbbs.comnts}} <span class="glyphicon glyphicon-comment"></span>
+									</td>
+									<td class="col-md-1">
+										test
+									</td>
+									<td class="col-md-2">
+										test11
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+			</table>
+			{% get_pages %}
+			<div>
+				当前第{{ pages.current }}页，共<strong>{{ pages|length }}</strong>页
+			</div>
+			<ul class="pagination">
+			
+				<li>
+					{{ pages.previous }}
+				</li>
+				{% for page in pages %}
+				<li>
+					<a href="{{ page.path }}">
+					{% if page.is_current %}
+					 <strong>{{ page.label }}</strong>
+					{% else %}
+					 {{ page.label }}
+					{% endif %}
+					</a>
+				</li>
+				{% endfor %}
+				<li>
+					{{ pages.next }}
+				</li>
+
+			</ul>
 					</div>
 					<div class="tab-pane" id="panel-166654">
-						<p>
-							Howdy, I'm in Section 3.
-						</p>
+					<!-- section 3 -->
+					<div class="col-md-12 column">
+						<!-- <button type="button" class="btn btn-default btn-primary pull-right">发布新主题</button> -->
+						<a id="postxl3" href="#modal-container-431747" role="button" class="btn btn-default btn-primary pull-right" data-toggle="modal">发布新主题</a>
+					</div>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>
+									主题
+								</th>
+								<th>
+									发布
+								</th>
+								<th>
+									时间
+								</th>
+								<th>
+									浏览数
+								</th>
+								<th>
+									评论数
+								</th>
+								<th>
+									最近回复
+								</th>
+								<th>
+									最近时间
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% paginate cbbslist3 using "fklist" %}
+							{% for cbbs in cbbslist3 %}
+								{% if forloop.counter|divisibleby:2 %}
+									<tr>
+								{% else %}
+									<tr class="warning">
+								{% endif %}
+									<td class="col-md-4">
+										<span class="glyphicon glyphicon-edit"></span>
+										<a href="topic/{{cbbs.id}}/"><strong>[{{cbbs.cbbsctgy}}]</strong>{{cbbs.title}}</a>
+									</td>
+									<td class="col-md-1">
+										{{cbbs.username|showname}}
+									</td>
+									<td class="col-md-2">
+										{{cbbs.create_ts|date:"Y-m-d H:i:s"}}
+									</td>
+									<td class="col-md-1">
+										{{cbbs.viewers}} <span class="glyphicon glyphicon-eye-open"></span>
+									</td>
+									<td class="col-md-1">
+										{{cbbs.comnts}} <span class="glyphicon glyphicon-comment"></span>
+									</td>
+									<td class="col-md-1">
+										test
+									</td>
+									<td class="col-md-2">
+										test11
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+			</table>
+			{% get_pages %}
+			<div>
+				当前第{{ pages.current }}页，共<strong>{{ pages|length }}</strong>页
+			</div>
+			<ul class="pagination">
+			
+				<li>
+					{{ pages.previous }}
+				</li>
+				{% for page in pages %}
+				<li>
+					<a href="{{ page.path }}">
+					{% if page.is_current %}
+					 <strong>{{ page.label }}</strong>
+					{% else %}
+					 {{ page.label }}
+					{% endif %}
+					</a>
+				</li>
+				{% endfor %}
+				<li>
+					{{ pages.next }}
+				</li>
+
+			</ul>
 					</div>
 				</div>
 			</div>

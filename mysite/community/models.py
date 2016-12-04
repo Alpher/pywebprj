@@ -5,6 +5,7 @@ __author__ = 'Alpher'
 
 from django.db import models
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
 
 # Create your models here.
 
@@ -39,7 +40,8 @@ class Cbbs(models.Model):
 	username = models.ForeignKey(User,verbose_name=u'账号')
 	category = models.ForeignKey(Category,verbose_name=u'所属板块')
 	cbbsctgy = models.ForeignKey(CbbsCategory,verbose_name=u'主题类型')
-	content = models.TextField(verbose_name=u'内容')
+	# content = models.TextField(verbose_name=u'内容')
+	content = RichTextField(u'内容')
 	create_ts = models.DateTimeField(verbose_name=u'发布时间',auto_now_add=True)
 	update_ts = models.DateTimeField(verbose_name=u'更新时间',auto_now=True)
 	viewers = models.IntegerField(verbose_name=u'浏览数',default=0)
@@ -63,7 +65,7 @@ class Comments(models.Model):
 	username = models.ForeignKey(User,verbose_name=u'账号')
 	comment = models.TextField(verbose_name=u'评论内容')
 	create_ts = models.DateTimeField(verbose_name=u'评论时间',auto_now_add=True)
-	ref_comment = models.ForeignKey('self',verbose_name=u'引用评论')
+	ref_comment = models.ForeignKey('self',verbose_name=u'引用评论',blank=True,null=True)
 	favors = models.IntegerField(verbose_name=u'支持数',default=0)
 	kicks = models.IntegerField(verbose_name=u'反对数',default=0)
 	is_reward = models.BooleanField(verbose_name=u'是否获赏',default=False)
@@ -71,7 +73,7 @@ class Comments(models.Model):
 	reward_score = models.IntegerField(verbose_name=u'获赏积分',default=0)
 
 	def __unicode__(self):
-		return self.id
+		return str(self.id)
 
 	class Meta:
 		verbose_name = u'评论'
@@ -88,7 +90,7 @@ class CbbsTips(models.Model):
 	op_ts = models.DateTimeField(verbose_name=u'打赏时间',auto_now_add=True)
 
 	def __unicode__(self):
-		return self.id
+		return str(self.id)
 
 	class Meta:
 		verbose_name = u'打赏日志'

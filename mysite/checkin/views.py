@@ -36,19 +36,37 @@ def add_uscore(uname,optype,opscore):
 		#今天
 		cur_dt = datetime.datetime.now().strftime("%Y-%m-%d")
 
-		#如果月初或签到中断
-		if datetime.datetime.now().strftime("%d") == '01' or lastdate <> last_chkindt:
+		thisscore = CHKIN_SCORE
+
+		#每年第一天
+		if datetime.datetime.now().strftime("%m-%d") == '01-01':
+			#初始化
 			sov.days_in_a_row = 1
+			sov.days_in_month = 1
+			sov.days_in_year = 1
+			sov.accum_score = CHKIN_SCORE
+			user.scores = CHKIN_SCORE
+		#断签
+		elif lastdate <> last_chkindt:
+			sov.days_in_a_row = 1
+			sov.days_in_year += 1
 			sov.accum_score += CHKIN_SCORE
 			user.scores += CHKIN_SCORE
-			thisscore = CHKIN_SCORE
+			#月初
 			if datetime.datetime.now().strftime("%d") == '01':
 				sov.days_in_month = 1
 			else:
 				sov.days_in_month += 1
+		#连签
 		else:
 			sov.days_in_a_row += 1
-			sov.days_in_month += 1
+			sov.days_in_year += 1
+			#月初
+			if datetime.datetime.now().strftime("%d") == '01':
+				sov.days_in_month = 1
+			else:
+				sov.days_in_month += 1
+
 			#连接签到10天及以上奖励15积分
 			if last_days_in_a_row >= 9:
 				sov.accum_score += CHKIN_SCORE_PLUS
@@ -59,11 +77,6 @@ def add_uscore(uname,optype,opscore):
 				user.scores += CHKIN_SCORE
 				thisscore = CHKIN_SCORE
 
-		#每年第一天
-		if datetime.datetime.now().strftime("%m-%d") == '01-01':
-			sov.days_in_year = 1
-		else:
-			sov.days_in_year += 1
 		sov.last_chkin_score = thisscore
 		sov.save()
 		user.save(update_fields=['scores'])
@@ -141,6 +154,14 @@ def getchkinov(request):
 			data={'days_in_a_row_2':sov.days_in_a_row,'days_in_month_2':sov.days_in_month,\
 				  'days_in_year_2':sov.days_in_year,'accum_score_2':sov.accum_score,\
 				 }
+
+			#上次签到日期
+			last_chkindt=sov.last_chkin_dt.strftime('%Y-%m-%d')
+
+			#如果今天是1号且未签到，则本月签到显示为0
+			if last_chkindt < datetime.datetime.now().strftime('%Y-%m-%d') and datetime.datetime.now().strftime('%d') == '01':
+				data['days_in_month_2'] = 0
+
 			#当前凌晨
 			today_first=datetime.datetime.now().strftime('%Y-%m-%d')+r' 00:00:00'
 			#读取签到顺序前五位
