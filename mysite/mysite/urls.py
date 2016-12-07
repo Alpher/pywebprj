@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.conf.urls import url,include
 from django.contrib import admin
-from mysite.views import userLogin
+from mysite.views import aboutus,smarket
 from django.contrib.auth.views import login, logout
 from profiles.views import *
 from credit.views import *
@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'^accounts/login/$', login,{'template_name':'login.html'}),
     url(r'^accounts/logout/$', logout,{'template_name':'logout.html'}),
     url(r'^$',homeindex),
+    url(r'^about/$',aboutus),
+    url(r'^smarket/$',smarket),
     url(r'^myprofile/$',saveUserInfo),
     url(r'^changepwd/$',changepwd),
     url(r'^pwdchanged/$',pwdchanged),

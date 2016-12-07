@@ -98,11 +98,22 @@ def mycheckin(request):
 	showname=getName(request)
 	userscore = user.scores
 
-	sov = UScoreOv.objects.get(username=request.user.username)
-	handle_chk = 1
+	#当前凌晨
+	today_first=datetime.datetime.now().strftime('%Y-%m-%d')+r' 00:00:00'
+	#读取签到顺序前五位
+	uslogs = UScoreLog.objects.filter(username=request.user.username,usot__type_code=TYPE_OF_CHKIN,update_ts__gt=datetime.datetime.strptime(today_first,"%Y-%m-%d %H:%M:%S"))
 
-	if datetime.datetime.now().strftime("%Y-%m-%d") == sov.last_chkin_dt.strftime('%Y-%m-%d'):
+	if uslogs:
 		handle_chk = 0
+	else:
+		handle_chk = 1
+
+	#如果不存在统计视图，则创建
+	if UScoreOv.objects.filter(username=request.user.username):
+		pass
+	else:
+		init_sov = UScoreOv(username=request.user.username,last_chkin_dt=datetime.datetime.strptime('1999-01-01',"%Y-%m-%d"))
+		init_sov.save()
 
 	return render(request,'checkin.html',locals())
 

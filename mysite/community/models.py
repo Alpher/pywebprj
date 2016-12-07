@@ -119,7 +119,29 @@ class Announcement(models.Model):
 # 	"""管理日志"""
 # 	pass
 
-# To Do
-# class CbbsUserLog(models.Model):
-# 	"""用户操作日志"""
-# 	pass
+class CUserOptCtgy(models.Model):
+	"""社区用户日志类型"""
+	opt_code = models.CharField(verbose_name=u'社区用户日志类型编码', max_length=50)
+	opt_desc = models.CharField(verbose_name=u'社区用户日志类型描述', max_length=200)
+
+	def __unicode__(self):
+		return self.opt_desc
+
+	class Meta:
+		verbose_name = u'社区用户日志类型'
+		verbose_name_plural = u'社区用户日志类型'
+
+class CbbsUserLog(models.Model):
+	"""社区用户日志"""
+	username = models.ForeignKey(User,verbose_name=u'账号')
+	optctgy = models.ForeignKey(CUserOptCtgy,verbose_name=u'用户日志类型')
+	opt_ts = models.DateTimeField(verbose_name=u'操作时间',auto_now_add=True)
+	topic = models.ForeignKey(Cbbs,verbose_name=u'涉及主题',blank=True,null=True)
+	comment = models.ForeignKey(Comments,verbose_name=u'涉及回复',blank=True,null=True)
+
+	def __unicode__(self):
+		return str(self.id)
+
+	class Meta:
+		verbose_name = u'社区用户日志'
+		verbose_name_plural = u'社区用户日志'

@@ -15,10 +15,17 @@ import base64
 
 # Create your views here.
 
-@login_required
+# @login_required
 def homeindex(request):
 	"""首页"""
-	return render(request,'index.html',{'showname':getName(request),'hostinfo':request.get_host(),'isStaff':request.user.is_staff})
+	#用户已登陆
+	if request.user.is_authenticated():
+		showname = getName(request)
+		anymous = False
+	else:
+		showname = u'游客'
+		anymous = True
+	return render(request,'index.html',{'showname':showname,'hostinfo':request.get_host(),'isStaff':request.user.is_staff,'anymous':anymous})
 
 @login_required
 def saveUserInfo(request):

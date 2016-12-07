@@ -22,9 +22,12 @@ def visitcom(request):
 	anns = Announcement.objects.filter(is_curanncm=True).order_by('-update_ts')
 	if anns:
 		parmdic['announce'] = anns[0]
-	parmdic['cbbslist'] = Cbbs.objects.filter(category__ctgy_code=1).order_by('-priority','-update_ts')
-	parmdic['cbbslist2'] = Cbbs.objects.filter(category__ctgy_code=2).order_by('-priority','-update_ts')
-	parmdic['cbbslist3'] = Cbbs.objects.filter(category__ctgy_code=3).order_by('-priority','-update_ts')
+	# 闲聊区主题列表
+	parmdic['cbbslist'] = Cbbs.objects.filter(category__ctgy_code=settings.XL_MODULE_CODE).order_by('-priority','-update_ts')
+	# 提问区主题列表
+	parmdic['cbbslist2'] = Cbbs.objects.filter(category__ctgy_code=settings.TW_MODULE_CODE).order_by('-priority','-update_ts')
+	# 反馈区主题列表
+	parmdic['cbbslist3'] = Cbbs.objects.filter(category__ctgy_code=settings.FK_MODULE_CODE).order_by('-priority','-update_ts')
 	return render(request,"community.html",parmdic)
 
 @login_required
@@ -52,6 +55,9 @@ def visittopic(request,offset):
 		parmdic['topic_showname'] = topic_user.nickname
 	else:
 		parmdic['topic_showname'] = topic_user.username
+
+	# To Do
+	# saveuserlog(topic_user.username,settings.VIEW_OPT_CODE,topic.id)
 
 	return render(request,"topic.html",parmdic)
 
@@ -131,3 +137,42 @@ def savetopiccomnt(request):
 		error_return_link = r'/changeavatar/'
 		error_info_strong = u'无效访问!'
 		return render(request,'innerror.html',locals())
+
+@transaction.atomic
+def saveuserlog(usrname,optcod,tpid=-1,cmntid=-1):
+	user = User.objects.get(username=usrname)
+	opttyp = CUserOptCtgy.objects.get(opt_code=optcod)
+
+	if tpid == -1:
+		topic = None
+	else:
+		topic = Cbbs.objects.get(id=tpid)
+
+	if cmntid == -1:
+		comment = None
+	else:
+		comment = Comments.objects.get(id=cmntid)
+
+	if optcod == settings.VIEW_OPT_CODE:
+		updateviewers(tpid)
+
+	ulog = CbbsUserLog(username=user,optctgy=opttyp,topic=topic,comment=comment)
+	ulog.save()
+
+def updateviewers(tpid):
+	try:
+		with transaction.atomic():
+			topic = Cbbs.objects.select_for_update().get(id=tpid)
+			topic.viewers += 1
+			topic.save(update_fields=['viewers'])
+	except Exception as e:
+		print e
+
+def updatecomnts(tpid):
+	try:
+		with transaction.atomic():
+			topic = Cbbs.objects.select_for_update().get(id=tpid)
+			topic.comnts += 1
+			topic.save(update_fields=['comnts'])
+	except Exception as e:
+		print e

@@ -31,7 +31,15 @@ class CbbsTipsAdmin(admin.ModelAdmin):
 
 class AnnouncementAdmin(admin.ModelAdmin):
 	"""docstring for AnnouncementAdmin"""
-	list_display = ('title','username','is_curanncm','update_ts',)	
+	list_display = ('title','username','is_curanncm','update_ts',)
+
+class CUserOptCtgyAdmin(admin.ModelAdmin):
+	"""docstring for CUserOptCtgyAdmin"""
+	list_display = ('opt_code','opt_desc',)
+
+class CbbsUserLogAdmin(admin.ModelAdmin):
+	"""docstring for CbbsUserLogAdmin"""
+	list_display = ('id','username','optctgy','opt_ts',)
 
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(CbbsCategory,CbbsCategoryAdmin)
@@ -39,3 +47,5 @@ admin.site.register(Cbbs,CbbsAdmin)
 admin.site.register(Comments,CommentsAdmin)
 admin.site.register(CbbsTips,CbbsTipsAdmin)
 admin.site.register(Announcement,AnnouncementAdmin)
+admin.site.register(CUserOptCtgy,CUserOptCtgyAdmin)
+admin.site.register(CbbsUserLog,CbbsUserLogAdmin)
