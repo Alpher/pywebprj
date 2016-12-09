@@ -1,0 +1,4 @@
+django-el-pagination
+django-ckeditor
+mysql-python
+PIL
