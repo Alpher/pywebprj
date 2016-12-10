@@ -52,6 +52,58 @@
         		$(this).parent().children('.rply').val('');
         		$(this).parents('.cmnt_of_cmnt_form').hide();
         	});
+        	//赞踩
+        	$('.thmbup').click(function(){
+        		var thmbidc = $(this).parent().children('.thmbidc').val();
+        		var thmbcmntid = $(this).parent().children('.thmbcmntid').val();
+        		var $this=$(this)
+        		if(thmbidc=='-1'){
+						$.ajax({
+                    			type:"GET",
+                    			//data: {topic_id:topicid, comment:lcmtofcmt,cmntid:lcmntid},
+                    			url: "/community/getfavors/"+{{topic_id}}+"-"+thmbcmntid+"/",
+                    			dataType: "html",
+                    			success: function(data){
+                    				$this.attr('style','color: rgb(255, 0, 0);');
+                    				$this.parent().children('.thmbupnum').html(data);
+                    				$this.parent().children('.thmbidc').val('3');
+                    			},
+                    			error: function(){
+                    			    alert("赞回复失败，请重试");
+                    			}
+                        });
+        		}else if(thmbidc=='3'){
+        			alert("你已经赞过这条回复啦!")
+        		}else{
+        			alert("你已经踩过这条回复啦!")
+        		}
+        	});
+
+        	$('.thmbdw').click(function(){
+        		var thmbidc = $(this).parent().children('.thmbidc').val();
+        		var thmbcmntid = $(this).parent().children('.thmbcmntid').val();
+        		var $this=$(this)
+        		if(thmbidc=='-1'){
+						$.ajax({
+                    			type:"GET",
+                    			//data: {topic_id:topicid, comment:lcmtofcmt,cmntid:lcmntid},
+                    			url: "/community/getkicks/"+{{topic_id}}+"-"+thmbcmntid+"/",
+                    			dataType: "html",
+                    			success: function(data){
+                    				$this.attr('style','color: rgb(255, 0, 0);');
+                    				$this.parent().children('.thmbdwnum').html(data);
+                    				$this.parent().children('.thmbidc').val('4');
+                    			},
+                    			error: function(){
+                    			    alert("踩回复失败，请重试");
+                    			}
+                        });
+        		}else if(thmbidc=='3'){
+        			alert("你已经赞过这条回复啦!")
+        		}else{
+        			alert("你已经踩过这条回复啦!")
+        		}
+        	});
 
         	$('#id_submit_tpcomnt').click(function(){
 
@@ -183,8 +235,8 @@
 					<div class="col-md-7 column">
 						<p class="text-left">
 							<h5>
-								0 <span class="glyphicon glyphicon-eye-open"></span>
-								0 <span class="glyphicon glyphicon-comment"></span>
+								{{topic_viewers}} <span class="glyphicon glyphicon-eye-open"></span>
+								{{topic_comnts}} <span class="glyphicon glyphicon-comment"></span>
 								<small>{{topic_create_ts|date:"Y-m-d H:i:s"}}</small>
 							</h5>
 						</p>
@@ -220,9 +272,25 @@
 							</div>
 							<div class="col-md-7 column">
 								<h5>
-									0 <span class="glyphicon glyphicon-thumbs-up"></span>
-									0 <span class="glyphicon glyphicon-thumbs-down"></span>
+									<a class="thmbupnum">{{comment.favors}}</a>
+										<a class="thmbup">
+										{% ifequal comment.id|showthumb:userid '3' %}
+										<span class="glyphicon glyphicon-thumbs-up" style="color: rgb(255, 0, 0);"></span>
+										{% else %}
+										<span class="glyphicon glyphicon-thumbs-up"></span>
+										{% endifequal %}
+										</a>
+									<a class="thmbdwnum">{{comment.kicks}}</a>
+									  <a class="thmbdw">
+										{% ifequal comment.id|showthumb:userid '4' %}
+										<span class="glyphicon glyphicon-thumbs-down" style="color: rgb(255, 0, 0);"></span>
+										{% else %}
+										<span class="glyphicon glyphicon-thumbs-down"></span>
+										{% endifequal %}
+									  </a>
 									<small>{{comment.create_ts|date:"Y-m-d H:i:s"}}</small>
+									<input type="hidden" class="thmbidc" value="{{comment.id|showthumb:userid}}">
+									<input type="hidden" class="thmbcmntid" value="{{comment.id}}">
 								</h5>
 								<p>
 								{{comment.id|showreplies|safe}}

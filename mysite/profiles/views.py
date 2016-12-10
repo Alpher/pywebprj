@@ -181,3 +181,18 @@ def getUserBase(request):
 	userbase['userid'] = user.id
 
 	return userbase
+
+#同步用户
+def syncusers(request):
+	basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+	filepath = os.path.join(basedir,'2.txt')
+	with open(filepath) as f:
+		for line in f:
+			lstr=line.strip('\n') 
+			if User.objects.filter(username=lstr):
+				pass
+			else:
+				newuser = User.objects.create_user(lstr,lstr+'@qq.com','1234abcd')
+				newuser.is_staff=False
+				newuser.save()
+	return HttpResponse(u'同步用户已完成')

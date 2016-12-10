@@ -51,13 +51,16 @@ def visittopic(request,offset):
 	parmdic['topic_create_ts'] = topic.create_ts
 	parmdic['topic_id'] = topic.id
 	parmdic['comments'] = tp_comments
+	# parmdic['topic_viewers'] = topic.viewers
+	parmdic['topic_comnts'] = topic.comnts
 	if topic_user.nickname:
 		parmdic['topic_showname'] = topic_user.nickname
 	else:
 		parmdic['topic_showname'] = topic_user.username
 
-	# To Do
-	# saveuserlog(topic_user.username,settings.VIEW_OPT_CODE,topic.id)
+	saveuserlog(request.user.username,settings.VIEW_OPT_CODE,topic.id)
+	topic.refresh_from_db()
+	parmdic['topic_viewers'] = topic.viewers
 
 	return render(request,"topic.html",parmdic)
 
@@ -120,13 +123,17 @@ def savetopiccomnt(request):
 			vtopic = Cbbs.objects.get(id = request.POST['topic_id'])
 			vcontent = request.POST['comment']
 			vusername = User.objects.get(username=request.user.username)
+			cmntid = -1
 			
 			if request.POST['cmntid']:
 				vrefcmt = Comments.objects.get(id=request.POST['cmntid'])
+				cmntid = request.POST['cmntid']
 				comment = Comments(cbbs=vtopic,username=vusername,comment=vcontent,ref_comment=vrefcmt)
 			else:
 				comment = Comments(cbbs=vtopic,username=vusername,comment=vcontent)
 			comment.save()
+
+			saveuserlog(request.user.username,settings.CMNT_OPT_CODE,request.POST['topic_id'],cmntid)
 
 			return HttpResponse("success")
 		except Exception as e:
@@ -154,12 +161,27 @@ def saveuserlog(usrname,optcod,tpid=-1,cmntid=-1):
 		comment = Comments.objects.get(id=cmntid)
 
 	if optcod == settings.VIEW_OPT_CODE:
-		updateviewers(tpid)
-
-	ulog = CbbsUserLog(username=user,optctgy=opttyp,topic=topic,comment=comment)
-	ulog.save()
+		uloghist = CbbsUserLog.objects.filter(username=user,optctgy=opttyp,topic__id=tpid)
+		if not uloghist:
+			ulog = CbbsUserLog(username=user,optctgy=opttyp,topic=topic,comment=comment)
+			ulog.save()
+			updateviewers(tpid)
+	elif optcod == settings.LIKE_OPT_CODE or optcod == settings.DLIK_OPT_CODE:
+		uloghist = CbbsUserLog.objects.filter(username=user,optctgy=opttyp,topic__id=tpid,comment__id=cmntid)
+		if not uloghist:
+			ulog = CbbsUserLog(username=user,optctgy=opttyp,topic=topic,comment=comment)
+			ulog.save()
+			if optcod == settings.LIKE_OPT_CODE:
+				updatelikes(tpid,cmntid)
+			else:
+				updatekicks(tpid,cmntid)
+	else:
+		ulog = CbbsUserLog(username=user,optctgy=opttyp,topic=topic,comment=comment)
+		ulog.save()
+		updatecomnts(tpid)
 
 def updateviewers(tpid):
+	"""更新浏览数"""
 	try:
 		with transaction.atomic():
 			topic = Cbbs.objects.select_for_update().get(id=tpid)
@@ -169,6 +191,7 @@ def updateviewers(tpid):
 		print e
 
 def updatecomnts(tpid):
+	"""更新回复数"""
 	try:
 		with transaction.atomic():
 			topic = Cbbs.objects.select_for_update().get(id=tpid)
@@ -176,3 +199,57 @@ def updatecomnts(tpid):
 			topic.save(update_fields=['comnts'])
 	except Exception as e:
 		print e
+
+def updatelikes(tpid,cmntid):
+	"""更新点赞数"""
+	try:
+		with transaction.atomic():
+			cmnt = Comments.objects.select_for_update().get(cbbs__id=tpid,id=cmntid)
+			cmnt.favors += 1
+			cmnt.save(update_fields=['favors'])
+	except Exception as e:
+		print e
+
+def updatekicks(tpid,cmntid):
+	"""更新踩踏数"""
+	try:
+		with transaction.atomic():
+			cmnt = Comments.objects.select_for_update().get(cbbs__id=tpid,id=cmntid)
+			cmnt.kicks += 1
+			cmnt.save(update_fields=['kicks'])
+	except Exception as e:
+		print e
+
+def thmbup(request,offset1,offset2):
+	if request.method == 'GET' and request.is_ajax():
+		try:
+			# tpid = int(offset1)
+			# cmntid = int(offset2)
+			saveuserlog(request.user.username,settings.LIKE_OPT_CODE,offset1,offset2)
+			cmnt = Comments.objects.get(id=offset2)
+			return HttpResponse(cmnt.favors)
+		except Exception as e:
+			print e
+			return HttpResponseServerError()
+	else:
+		error_return_link_lable = u'返回'
+		error_return_link = r'/changeavatar/'
+		error_info_strong = u'无效访问!'
+		return render(request,'innerror.html',locals())
+
+def thmbdw(request,offset1,offset2):
+	if request.method == 'GET' and request.is_ajax():
+		try:
+			# tpid = int(offset1)
+			# cmntid = int(offset2)
+			saveuserlog(request.user.username,settings.DLIK_OPT_CODE,offset1,offset2)
+			cmnt = Comments.objects.get(id=offset2)
+			return HttpResponse(cmnt.kicks)
+		except Exception as e:
+			print e
+			return HttpResponseServerError()
+	else:
+		error_return_link_lable = u'返回'
+		error_return_link = r'/changeavatar/'
+		error_info_strong = u'无效访问!'
+		return render(request,'innerror.html',locals())

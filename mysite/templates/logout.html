@@ -35,9 +35,9 @@ var t = 5;
 //显示倒数秒数  
 function showTime(){  
     t -= 1;  
-    document.getElementById('div1').innerHTML= "注销成功！"+t+"秒后跳转，如无法跳转，请点击<a href=/accounts/login/>返回</a>登录页面";  
+    document.getElementById('div1').innerHTML= "注销成功！"+t+"秒后跳转，如无法跳转，请点击<a href=/>返回</a>首页";  
     if(t==0){  
-        location.href='/accounts/login/';  
+        location.href='/';  
     }  
     //每秒执行一次,showTime()  
     setTimeout("showTime()",1000);  

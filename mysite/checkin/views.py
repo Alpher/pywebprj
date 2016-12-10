@@ -183,7 +183,8 @@ def getchkinov(request):
 				user=User.objects.filter(username=uslog.username)
 				if user:
 					if user[0].nickname:
-						data['top'+str(idx)] = user[0].nickname+'('+uslog.username+')'
+						# data['top'+str(idx)] = user[0].nickname+'('+uslog.username+')'
+						data['top'+str(idx)] = user[0].nickname
 					else:
 						data['top'+str(idx)] = uslog.username
 				else:
