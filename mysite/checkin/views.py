@@ -20,74 +20,87 @@ from mysite.settings import TYPE_OF_CHKIN,TYPE_OF_EXCHG,TYPE_OF_VIOLT,CHKIN_SCOR
 @transaction.atomic
 def add_uscore(uname,optype,opscore):
 	#用户资料
-	user = User.objects.get(username=uname)
-	thisscore = opscore
-	#签到积分
-	if optype == TYPE_OF_CHKIN:
-		sov = UScoreOv.objects.get(username=uname)
+	try:
+		with transaction.atomic():
+			user = User.objects.select_for_update().get(username=uname)
+			thisscore = opscore
+			#签到积分
+			if optype == TYPE_OF_CHKIN:
+				sov = UScoreOv.objects.select_for_update().get(username=uname)
+				sov.refresh_from_db()
 
-		#上次连续签到天数
-		last_days_in_a_row = sov.days_in_a_row
-
-		#昨天
-		lastdate=(datetime.datetime.now() - datetime.timedelta(days = 1)).strftime('%Y-%m-%d')
-		#上次签到日期
-		last_chkindt=sov.last_chkin_dt.strftime('%Y-%m-%d')
-		#今天
-		cur_dt = datetime.datetime.now().strftime("%Y-%m-%d")
-
-		thisscore = CHKIN_SCORE
-
-		#每年第一天
-		if datetime.datetime.now().strftime("%m-%d") == '01-01':
-			#初始化
-			sov.days_in_a_row = 1
-			sov.days_in_month = 1
-			sov.days_in_year = 1
-			sov.accum_score = CHKIN_SCORE
-			user.scores = CHKIN_SCORE
-		#断签
-		elif lastdate <> last_chkindt:
-			sov.days_in_a_row = 1
-			sov.days_in_year += 1
-			sov.accum_score += CHKIN_SCORE
-			user.scores += CHKIN_SCORE
-			#月初
-			if datetime.datetime.now().strftime("%d") == '01':
-				sov.days_in_month = 1
+				if sov.last_chkin_dt.strftime('%Y-%m-%d') == datetime.datetime.now().strftime("%Y-%m-%d"):
+					pass
+				else:
+					#上次连续签到天数
+					last_days_in_a_row = sov.days_in_a_row
+			
+					#昨天
+					lastdate=(datetime.datetime.now() - datetime.timedelta(days = 1)).strftime('%Y-%m-%d')
+					#上次签到日期
+					last_chkindt=sov.last_chkin_dt.strftime('%Y-%m-%d')
+					#今天
+					cur_dt = datetime.datetime.now().strftime("%Y-%m-%d")
+			
+					thisscore = CHKIN_SCORE
+			
+					#每年第一天
+					if datetime.datetime.now().strftime("%m-%d") == '01-01':
+						#初始化
+						sov.days_in_a_row = 1
+						sov.days_in_month = 1
+						sov.days_in_year = 1
+						sov.accum_score = CHKIN_SCORE
+						user.scores = CHKIN_SCORE
+					#断签
+					elif lastdate <> last_chkindt:
+						sov.days_in_a_row = 1
+						sov.days_in_year += 1
+						sov.accum_score += CHKIN_SCORE
+						user.scores += CHKIN_SCORE
+						#月初
+						if datetime.datetime.now().strftime("%d") == '01':
+							sov.days_in_month = 1
+						else:
+							sov.days_in_month += 1
+					#连签
+					else:
+						sov.days_in_a_row += 1
+						sov.days_in_year += 1
+						#月初
+						if datetime.datetime.now().strftime("%d") == '01':
+							sov.days_in_month = 1
+						else:
+							sov.days_in_month += 1
+			
+						#连接签到10天及以上奖励15积分
+						if last_days_in_a_row >= 9:
+							sov.accum_score += CHKIN_SCORE_PLUS
+							user.scores += CHKIN_SCORE_PLUS
+							thisscore = CHKIN_SCORE_PLUS
+						else:
+							sov.accum_score += CHKIN_SCORE
+							user.scores += CHKIN_SCORE
+							thisscore = CHKIN_SCORE
+			
+					sov.last_chkin_score = thisscore
+					sov.save()
+					user.save(update_fields=['scores'])
+					#积分日志
+					newslog = UScoreLog(username=uname,score=thisscore,usot=UScoreOpType.objects.get(type_code=optype),opby='system')
+					newslog.save()
+			#其他计分
 			else:
-				sov.days_in_month += 1
-		#连签
-		else:
-			sov.days_in_a_row += 1
-			sov.days_in_year += 1
-			#月初
-			if datetime.datetime.now().strftime("%d") == '01':
-				sov.days_in_month = 1
-			else:
-				sov.days_in_month += 1
+				user.scores += opscore
+				user.save(update_fields=['scores'])
+		
+				#积分日志
+				newslog = UScoreLog(username=uname,score=thisscore,usot=UScoreOpType.objects.get(type_code=optype),opby='system')
+				newslog.save()
+	except Exception as e:
+		print e
 
-			#连接签到10天及以上奖励15积分
-			if last_days_in_a_row >= 9:
-				sov.accum_score += CHKIN_SCORE_PLUS
-				user.scores += CHKIN_SCORE_PLUS
-				thisscore = CHKIN_SCORE_PLUS
-			else:
-				sov.accum_score += CHKIN_SCORE
-				user.scores += CHKIN_SCORE
-				thisscore = CHKIN_SCORE
 
-		sov.last_chkin_score = thisscore
-		sov.save()
-		user.save(update_fields=['scores'])
-	#其他计分
-	else:
-		user.scores += opscore
-		user.save(update_fields=['scores'])
-
-	#积分日志
-	newslog = UScoreLog(username=uname,score=thisscore,usot=UScoreOpType.objects.get(type_code=optype),opby='system')
-	newslog.save()
 
 
 @login_required

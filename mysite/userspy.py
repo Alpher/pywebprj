@@ -22,9 +22,9 @@ driver.switch_to_frame('login_frame')
 #通过使用选择器选择到表单元素进行模拟输入和点击按钮提交
 driver.find_element_by_id('switcher_plogin').click()
 driver.find_element_by_id('u').clear()
-driver.find_element_by_id('u').send_keys('****') #需要登录的QQ号
+driver.find_element_by_id('u').send_keys('1802180363') #需要登录的QQ号
 driver.find_element_by_id('p').clear()
-driver.find_element_by_id('p').send_keys('****') #需要登录的QQ号对应的密码
+driver.find_element_by_id('p').send_keys('ap19870222') #需要登录的QQ号对应的密码
 driver.find_element_by_id('login_button').click()
 
 time.sleep(10)

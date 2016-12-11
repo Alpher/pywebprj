@@ -184,15 +184,37 @@ def getUserBase(request):
 
 #同步用户
 def syncusers(request):
-	basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-	filepath = os.path.join(basedir,'2.txt')
-	with open(filepath) as f:
-		for line in f:
-			lstr=line.strip('\n') 
-			if User.objects.filter(username=lstr):
+	if request.user.is_superuser:
+		basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+		filepath = os.path.join(basedir,'members.txt')
+		userlist=[]
+		totl_num=0
+		add_num=0
+		inactive_num=0
+		whitelist=['admin','user1','user3','user66']
+		with open(filepath) as f:
+			for line in f:
+				totl_num+=1
+				lstr=line.strip('\n')
+				userlist.append(lstr)
+				if User.objects.filter(username=lstr):
+					pass
+				else:
+					add_num+=1
+					newuser = User.objects.create_user(lstr,lstr+'@qq.com','1234abcd')
+					newuser.is_staff=False
+					newuser.save()
+		users = User.objects.all()
+		for usr in users:
+			if usr.username in userlist:
 				pass
 			else:
-				newuser = User.objects.create_user(lstr,lstr+'@qq.com','1234abcd')
-				newuser.is_staff=False
-				newuser.save()
-	return HttpResponse(u'同步用户已完成')
+				if usr.username in whitelist:
+					pass
+				else:
+					inactive_num+=1
+					usr.is_active = False
+					usr.save(update_fields=['is_active'])
+		return HttpResponse(u'本次同步用户已完成,其中总成员数:'+str(totl_num)+u',新增成员数:'+str(add_num)+u',取消激活成员数:'+str(inactive_num))
+	else:
+		return HttpResponse(u'你没有权限执行此操作')
