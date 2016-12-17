@@ -1,0 +1,115 @@
+{% extends "index_base.html" %}
+{% block js_content %}
+<style>
+#lottery{width:570px;height:510px;margin:0px auto;border:4px solid #ba1809;}
+#lottery table{background-color:yellow;}
+#lottery table td{position:relative;width:190px;height:170px;text-align:center;color:#333;font-index:-999}
+#lottery table td img{display:block;width:190px;height:170px;}
+#lottery table td a{width:190px;height:170px;display:block;text-decoration:none;background:url(/static/images/rotate/lottery1.jpg) no-repeat top center;}
+#lottery table td a:hover{background-image:url(/static/images/rotate/lottery2.jpg);}
+#lottery table td.active .mask{display:block;}
+.mask{
+    width:100%;
+    height:100%;
+    position:absolute;
+    left:0;
+    top:0;
+    background:url(/static/images/rotate/mask.png) no-repeat;
+    /*background-color: rgba(252,211,4,0.5);*/
+    display:none;
+}
+</style>
+<!-- <script type="text/javascript">
+	$(document).ready(function(){
+		alert($('#mychance').text()==1);
+	});
+</script> -->
+<script src="/static/js/lottery.js"></script>
+
+{% endblock %}
+{% block middle_area %}
+
+<div class="col-md-12 column">
+			<div class="row clearfix">
+				<div class="col-md-3 column">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								我的抽奖
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div id="mymemo">
+							{% if has_got_one %}
+							<p>本次活动你已中奖</p>
+							{% else %}
+								<p>抽奖机会:<strong id="mychance" style="color: Red">{{mychance}}</strong></p>
+								<p>可用积分:<strong id="myscore" style="color: Red">{{userscore}}</strong></p>
+							{% endif %}
+							</div>
+							<input type="hidden" id="id_got_one" value="{{has_got_one}}">
+						</div>
+					</div>
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								中奖名单
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div id="id_rwd_list">
+							{% if rewardlist %}
+								{% for rwd in rewardlist %}
+									<p>
+										{{rwd}}
+									</p>
+								{% endfor %}
+							{% endif %}
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								规则说明
+							</h3>
+						</div>
+						<div class="panel-body">
+							<p>1.每人每天一次抽奖机会，中奖后不可再抽</p>
+							<p>2.20积分可额外抽奖一次</p>
+							<p>3.中奖后可在个人积分奖品中心领取查看</p>
+						</div>
+					</div>
+
+				</div>
+				<div class="col-md-9 column">
+					<!--效果html开始-->
+					<div class="keBody" id="lottery">
+					    <table border="0" cellpadding="0" cellspacing="0">
+					        <tr>
+					            <td class="lottery-unit lottery-unit-0"><img src="/static/images/rotate/gift0.jpg"><div class="mask"></div></td>
+					            <td class="lottery-unit lottery-unit-1"><img src="/static/images/rotate/gift1.jpg"><div class="mask"></div></td>
+					            <td class="lottery-unit lottery-unit-2"><img src="/static/images/rotate/gift2.jpg"><div class="mask"></div></td>
+					        </tr>
+					        <tr>
+					            <td class="lottery-unit lottery-unit-7"><img src="/static/images/rotate/gift7.jpg"><div class="mask"></div></td>
+					            <td><a href="#"></a></td>
+					            <td class="lottery-unit lottery-unit-3"><img src="/static/images/rotate/gift3.jpg"><div class="mask"></div></td>
+					        </tr>
+					        <tr>
+					            <td class="lottery-unit lottery-unit-6"><img src="/static/images/rotate/gift6.jpg"><div class="mask"></div></td>
+					            <td class="lottery-unit lottery-unit-5"><img src="/static/images/rotate/gift5.jpg"><div class="mask"></div></td>
+					            <td class="lottery-unit lottery-unit-4"><img src="/static/images/rotate/gift4.jpg"><div class="mask"></div></td>
+					        </tr>
+					    </table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+<!--效果html结束-->
+
+{% endblock %}

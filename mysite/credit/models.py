@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 __author__ = 'Alpher'
 
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -57,6 +58,19 @@ class Ecards(models.Model):
 		verbose_name = u'卡品清单'
 		verbose_name_plural = u'卡品清单'
 
+class Actions(models.Model):
+	"""活动"""
+	action_code = models.CharField(max_length=50, verbose_name=u'活动编码')
+	action_desc = models.CharField(verbose_name=u'活动描述', max_length=200)
+	action_type = models.ForeignKey(ActionType,verbose_name=u'活动类型')
+	is_cur_action = models.BooleanField(verbose_name=u'是否当前活动')
+
+	def __unicode__(self):
+		return self.action_desc
+
+	class Meta:
+		verbose_name=u'活动'
+		verbose_name_plural=u'活动'
 
 class Rewards(models.Model):
 	"""奖品模型"""
@@ -82,6 +96,7 @@ class Rewards(models.Model):
 class MyRewards(models.Model):
 	"""中奖模型"""
 	username = models.CharField(max_length=50, verbose_name=u'中奖账号')
+	action = models.ForeignKey(Actions,verbose_name=u'活动')
 	reward = models.ForeignKey(Rewards, verbose_name=u'奖品')
 	reward_dt = models.DateField(verbose_name=u'中奖日期', null=True, blank=True)
 	isExchg = models.BooleanField(verbose_name=u'是否已领奖')
@@ -114,3 +129,38 @@ class PhoneNumType(models.Model):
 	class Meta:
 		verbose_name = u'运营商手机号段'
 		verbose_name_plural = u'运营商手机号段'
+
+class ActionConf(models.Model):
+	"""活动配置"""
+	action = models.ForeignKey(Actions,verbose_name=u'活动')
+	reward = models.ForeignKey(Rewards,verbose_name=u'奖品')
+	rw_order = models.IntegerField(verbose_name=u'奖品排序')
+	act_base = models.IntegerField(verbose_name=u'概率基数')
+	rwd_s_idx = models.IntegerField(verbose_name=u'概率范围开始数')
+	rwd_e_idx = models.IntegerField(verbose_name=u'概率范围结束数')
+
+	def __unicode__(self):
+		return str(self.id)
+
+	class Meta:
+		verbose_name=u'活动配置'
+		verbose_name_plural=u'活动配置'
+
+class LotteryLog(models.Model):
+	"""抽奖日志"""
+	username = models.ForeignKey(User,verbose_name=u'账号')
+	action = models.ForeignKey(Actions,verbose_name=u'活动')
+	opt_ts = models.DateTimeField(verbose_name=u'抽奖时间',auto_now_add=True)
+	random_num = models.IntegerField(verbose_name=u'抽奖随机数')
+	opt_remark = models.CharField(verbose_name=u'备注', max_length=200)
+
+	def __unicode__(self):
+		return str(self.id)
+
+	class Meta:
+		verbose_name=u'抽奖日志'
+		verbose_name_plural=u'抽奖日志'
+			
+		
+			
+			

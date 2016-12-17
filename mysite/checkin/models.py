@@ -42,7 +42,7 @@ class UScoreOv(models.Model):
 	days_in_month = models.IntegerField(verbose_name=u'本月签到天数',default=0)
 	days_in_year = models.IntegerField(verbose_name=u'本年签到天数',default=0)
 	accum_score = models.IntegerField(verbose_name=u'签到累计积分',default=0)
-	last_chkin_dt = models.DateField(verbose_name=u'上次签到日期',auto_now=True)
+	last_chkin_dt = models.DateField(verbose_name=u'上次签到日期')
 	last_chkin_score = models.IntegerField(verbose_name=u'上次签到积分',default=0)
 
 	def __unicode__(self):

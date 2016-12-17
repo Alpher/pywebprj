@@ -31,3 +31,4 @@ def smarket(request):
 	"""积分商城页面"""
 	parmdic = getUserBase(request)
 	return render(request,'scoremarket.html',parmdic)
+

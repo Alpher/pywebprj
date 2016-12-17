@@ -84,6 +84,7 @@ def add_uscore(uname,optype,opscore):
 							thisscore = CHKIN_SCORE
 			
 					sov.last_chkin_score = thisscore
+					sov.last_chkin_dt=datetime.datetime.now().strftime('%Y-%m-%d')
 					sov.save()
 					user.save(update_fields=['scores'])
 					#积分日志
@@ -144,7 +145,7 @@ def checkin(request):
 			return HttpResponseServerError()
 	else:
 		error_return_link_lable = u'返回'
-		error_return_link = r'/changeavatar/'
+		error_return_link = r'/mycheckin/'
 		error_info_strong = u'无效访问!'
 		return render(request,'innerror.html',locals())
 
@@ -165,7 +166,7 @@ def getchkinday(request):
 			return HttpResponseServerError()
 	else:
 		error_return_link_lable = u'返回'
-		error_return_link = r'/changeavatar/'
+		error_return_link = r'/mycheckin/'
 		error_info_strong = u'无效访问!'
 		return render(request,'innerror.html',locals())
 
@@ -211,6 +212,6 @@ def getchkinov(request):
 			return HttpResponseServerError()
 	else:
 		error_return_link_lable = u'返回'
-		error_return_link = r'/changeavatar/'
+		error_return_link = r'/mycheckin/'
 		error_info_strong = u'无效访问!'
 		return render(request,'innerror.html',locals())

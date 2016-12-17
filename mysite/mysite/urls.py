@@ -22,6 +22,7 @@ from django.contrib.auth.views import login, logout
 from profiles.views import *
 from credit.views import *
 from checkin.views import *
+from lottery.views import lottery,roll
 #from django.conf import settings
 #from django.conf.urls.static import static
 
@@ -47,4 +48,6 @@ urlpatterns = [
     url(r'^community/',include('community.urls')),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^syncusers/$',syncusers),
+    url(r'^drawer/$',lottery),
+    url(r'^roll/',roll)
 ]

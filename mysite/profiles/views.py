@@ -179,6 +179,8 @@ def getUserBase(request):
 	userbase['username'] = user.username
 	#用户ID
 	userbase['userid'] = user.id
+	#当前积分
+	userbase['userscore'] = user.scores
 
 	return userbase
 

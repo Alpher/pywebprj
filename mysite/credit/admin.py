@@ -35,6 +35,16 @@ class EcardsAdmin(admin.ModelAdmin):
 class PhoneNumTypeAdmin(admin.ModelAdmin):
 	"""PhoneNumTypeAdmin"""
 	list_display = ('prefixnum','prefixnumtype',)
+
+class ActionsAdmin(admin.ModelAdmin):
+	"""docstring for ActionsAdmin"""
+	list_display = ('action_code','action_desc','action_type','is_cur_action',)
+
+class ActionConfAdmin(admin.ModelAdmin):
+	list_display = ('id','action','rw_order','reward','act_base','rwd_s_idx','rwd_e_idx',)
+
+class LotteryLogAdmin(admin.ModelAdmin):
+	list_display = ('id','username','opt_ts','random_num','opt_remark',)	
 		
 
 admin.site.register(EcardType,EcardTypeAdmin)
@@ -44,4 +54,6 @@ admin.site.register(RewardsType,RewardsTypeAdmin)
 admin.site.register(Rewards,RewardsAdmin)
 admin.site.register(MyRewards,MyRewardsAdmin)
 admin.site.register(PhoneNumType,PhoneNumTypeAdmin)
-
+admin.site.register(Actions,ActionsAdmin)
+admin.site.register(ActionConf,ActionConfAdmin)
+admin.site.register(LotteryLog,LotteryLogAdmin)
