@@ -50,8 +50,9 @@ def lottery(request):
 	if cur_action:
 		rewds = MyRewards.objects.filter(action=cur_action)
 		for rwd in rewds:
-			rwdlist.append(getNameByUn(rwd.username)+u' 获得了 '+rwd.reward.reward_desc+u'X1')
+			rwdlist.append(getNameByUn(rwd.username)+u' 获得了 '+rwd.reward.reward_desc)
 	parmdic['rewardlist'] = rwdlist
+	parmdic['lottery_score'] = settings.LOTTERY_SCORE
 	return render(request,'lottery.html',parmdic)
 
 @login_required
@@ -63,6 +64,7 @@ def roll(request):
 			use_score = False
 			data={}
 			data['rollnum'] = settings.LOTTERY_INITIAL_IDX
+			data['rewardstr'] = ''
 			#服务器端校验
 			if myltry['has_got_one']:
 				data['status'] = 0
@@ -88,6 +90,7 @@ def roll(request):
 						rwd_index = rwd.rw_order
 						myltry['has_got_one'] = True
 						rwd_id = rwd.reward.id
+						data['rewardstr'] = Rewards.objects.get(id=rwd.reward.id).reward_desc
 				logremark=u''
 				# print all_idx_list
 				if rwd_index == -1:
@@ -107,6 +110,7 @@ def roll(request):
 				data['mychance']=getuserltry(request)['mychance']
 				data['myscore']=cur_user.scores
 				data['cur_username'] = getNameByUn(request.user.username)
+				data['has_got_one'] = str(myltry['has_got_one'])
 			return JsonResponse(data)
 		except Exception as e:
 			print e

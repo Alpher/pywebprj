@@ -1,6 +1,8 @@
-var lotteryinfo = "";
-var lotterynum=-1;
-var cur_user = "";
+var lotteryinfo = ""; //转动结束后显示信息
+var got_one=""; //是否中奖
+var cur_user = ""; //当前用户昵称/账号
+var lottery_score = 0; //额外抽奖抵扣积分
+var rewardstr = ""; //奖品信息
 var lottery={
     index:-1,    //当前转动到哪个位置，起点位置
     count:0,    //总共有多少个位置
@@ -45,11 +47,11 @@ function roll(){
         lottery.prize=-1;
         lottery.times=0;
         click=false;
-        if(lotterynum=='1'){
+        if(got_one=="True"){
             $('#mymemo').html("本次活动你已经中奖");
-            $('#id_rwd_list').append(cur_user+" 获得了 "+"针织小龟 X1");
+            $('#id_rwd_list').append(cur_user+" 获得了 "+ rewardstr);
         }
-        alert(lotteryinfo);//弹出中奖信息
+        alert(lotteryinfo);//转动结束后弹出信息
 
     }else{
         if (lottery.times<lottery.cycle) {
@@ -78,21 +80,24 @@ var click=false;
 
 
 $(document).ready(function(){
+
+    lottery_score = $('#id_ltry_score').val();
+    got_one = $('#id_got_one').val();
+
     lottery.init('lottery');
     $("#lottery a").click(function(){
         var chance = $('#mychance').text();
         var score = $('#myscore').text();
         var handle = true;
-        var got_one= $('#id_got_one').val();
 
         if(got_one=="True"){
             handle = false;
             alert("本次活动你已经中过奖，不能再抽奖");
         }else{
-            if(chance <= 0 && score < 20){
+            if(chance <= 0 && score < Number(lottery_score)){
                 handle = false;
-            }else if(chance <= 0 && score >= 20){
-                var status = confirm("你今天的抽奖机会已用完，你仍可使用20积分额外抽奖一次，是否使用积分?");
+            }else if(chance <= 0 && score >= Number(lottery_score)){
+                var status = confirm("你今天的抽奖机会已用完，你仍可使用"+lottery_score+"积分额外抽奖一次，是否使用积分?");
                 if(status){
                     handle = true;
                 }else{
@@ -124,6 +129,8 @@ $(document).ready(function(){
                         var statu = data['status']
                         var rollnum = data['rollnum'];
                         cur_user = data['cur_username'];
+                        got_one = data['has_got_one'];
+                        rewardstr = data['rewardstr'];
 
                         if(statu==0){
                             lotteryinfo="本次活动你已经中过奖，不能再抽奖";
@@ -133,9 +140,9 @@ $(document).ready(function(){
                             //alert(rollnum);
                             lottery.prize=rollnum;
 
-                            if(rollnum=='1'){
-                                lotteryinfo="恭喜你抽中针织小龟"
-                                lotterynum=rollnum
+                            if(got_one=="True"){
+
+                                lotteryinfo="恭喜你抽中"+rewardstr
                                 $('#id_got_one').val('True');
 
                             }else{
