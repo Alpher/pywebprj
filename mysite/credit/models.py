@@ -64,6 +64,7 @@ class Actions(models.Model):
 	action_desc = models.CharField(verbose_name=u'活动描述', max_length=200)
 	action_type = models.ForeignKey(ActionType,verbose_name=u'活动类型')
 	is_cur_action = models.BooleanField(verbose_name=u'是否当前活动')
+	create_ts = models.DateTimeField(verbose_name=u'创建时间',auto_now_add=True)
 
 	def __unicode__(self):
 		return self.action_desc
@@ -78,12 +79,15 @@ class Rewards(models.Model):
 	reward_desc = models.CharField(verbose_name=u'奖品描述', max_length=200)
 	reward_type = models.ForeignKey(RewardsType, verbose_name=u'奖品类型')
 	action_type = models.ForeignKey(ActionType, verbose_name=u'活动类型')
+	isphonecard = models.BooleanField(verbose_name=u'是否手机充值卡', default=False)
 	reward_cost = models.IntegerField(verbose_name=u'抵扣积分', null=True, blank=True)
+	reward_cost_ori = models.IntegerField(verbose_name=u'打拆前抵扣积分', null=True, blank=True)
 	reward_effdt = models.DateField(verbose_name=u'生效日期')
 	reward_enddt = models.DateField(verbose_name=u'失效日期')
 	reward_nums = models.IntegerField(verbose_name=u'奖品总数')
 	reward_left = models.IntegerField(verbose_name=u'奖品剩余数')
 	reward_rmk = models.CharField(verbose_name=u'奖品备注', max_length=1000, null=True, blank=True)
+	reward_pic = models.ImageField(verbose_name=u'奖品图片',upload_to='smarket/',default=r'static/images/smarket/default.jpg')
 
 	def __unicode__(self):
 		return self.reward_desc

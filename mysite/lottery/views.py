@@ -13,6 +13,7 @@ import datetime
 from django.db import transaction
 from django.contrib.auth.models import User
 from checkin.views import add_uscore
+from credit.views import grabreward
 
 
 # Create your views here.
@@ -46,11 +47,18 @@ def lottery(request):
 	"""抽奖页面"""
 	parmdic = getuserltry(request)
 	rwdlist = []
+	parmdic['action_valid'] = False
 	cur_action = Actions.objects.filter(action_type__actiontype_code=settings.ACTIONTYPEOFREWARD,is_cur_action=True)
 	if cur_action:
 		rewds = MyRewards.objects.filter(action=cur_action)
 		for rwd in rewds:
 			rwdlist.append(getNameByUn(rwd.username)+u' 获得了 '+rwd.reward.reward_desc)
+
+		actconf = ActionConf.objects.filter(action=cur_action)
+		for atf in actconf:
+			if atf.reward.reward_left > 0:
+				parmdic['action_valid'] = True
+				break
 	parmdic['rewardlist'] = rwdlist
 	parmdic['lottery_score'] = settings.LOTTERY_SCORE
 	return render(request,'lottery.html',parmdic)
@@ -101,9 +109,11 @@ def roll(request):
 					add_uscore(request.user.username,settings.TYPE_OF_EXCHG,(0-settings.LOTTERY_SCORE))
 					logremark=u'积分抽奖'
 				if myltry['has_got_one']:
-					isSuccess = getreward(request.user.username,cur_action[0].id,rwd_id)
-					if not isSuccess:
+					getstatus = grabreward(request.user.username,cur_action[0].id,rwd_id)
+					# if not isSuccess:
+					if getstatus <> 1:
 						data['rollnum'] = random.choice(all_idx_list)
+						myltry['has_got_one'] = False
 				cur_user=User.objects.get(username=request.user.username)
 				ltrylog=LotteryLog(username=cur_user,action=cur_action[0],random_num=cur_user_random,opt_remark=logremark)
 				ltrylog.save()
@@ -122,22 +132,3 @@ def roll(request):
 		error_info_strong = u'无效访问!'
 		return render(request,'innerror.html',locals())
 
-def getreward(usrname,actionid,rewardid):
-	has_got_one = False
-	try:
-		with transaction.atomic():
-			myrwd=Rewards.objects.select_for_update().get(id=rewardid)
-			myrwd.refresh_from_db()
-
-			if myrwd.reward_left >= 1:
-				myrwd.reward_left -= 1
-				has_got_one = True
-				myrwd.save()
-				myrwdrec = MyRewards(username=usrname,action=Actions.objects.get(id=actionid),reward=Rewards.objects.get(id=rewardid),reward_dt=datetime.datetime.now().strftime('%Y-%m-%d'),isExchg=False)
-				myrwdrec.save()
-			else:
-				has_got_one = False		
-	except Exception as e:
-		has_got_one = False
-	finally:
-		return has_got_one

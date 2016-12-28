@@ -6,12 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from profiles.views import getName
-from credit.models import MyRewards,Rewards,Ecards,PhoneNumType
+from credit.models import MyRewards,Rewards,Ecards,PhoneNumType,Actions
 from django.http import Http404
 from credit.forms import GetRewardForm
 from django.db import transaction
 import datetime,time
-from mysite.settings import ACTIONTYPEOFREWARD,TYPEOFACTUALREW
+from mysite.settings import ACTIONTYPEOFREWARD,TYPEOFACTUALREW,TYPE_OF_EXCHG
+from checkin.views import add_uscore
 # Create your views here.
 
 
@@ -85,6 +86,8 @@ def getreward(request,reward_id):
 	showname=getName(request)
 	#是否实物页面
 	showRew = False
+	#是否手机充值卡
+	isPhoneCard = False
 
 	cur_dt = datetime.datetime.now().strftime("%Y-%m-%d") 
 
@@ -102,6 +105,8 @@ def getreward(request,reward_id):
 			#根据实物/虚拟物品显不同信息
 			if reward.reward.reward_type.rewardstype_code == TYPEOFACTUALREW:
 				showRew = True
+			if reward.reward.isphonecard:
+				isPhoneCard = True
 
 	if request.method == 'POST':
 		form = GetRewardForm(request.POST)
@@ -121,9 +126,13 @@ def getreward(request,reward_id):
 				error_return_link_lable = u'返回'
 				error_tips = u'请联系管理员.'
 				error_return_link = r'/mycredit/'
-	
-				#检索手机运营商
-				phnumtype = PhoneNumType.objects.filter(prefixnum=cd['phone'][:3])
+				
+				if isPhoneCard:
+					#检索手机运营商
+					phnumtype = PhoneNumType.objects.filter(prefixnum=cd['phone'][:3])
+				else:
+					phnumtype = PhoneNumType.objects.filter(prefixnum='000')
+
 				if phnumtype:
 					ecardtypeid = phnumtype[0].prefixnumtype.id
 					#检索可用卡
@@ -168,3 +177,44 @@ def getreward(request,reward_id):
 		form = GetRewardForm(initial={'name':'--','addr':'--','addrcod':'--',})
 
 	return render(request,'getreward.html',locals())
+
+def grabreward(usrname,actionid,rewardid):
+	"""抢占奖品 返回值 1-成功 2-奖品已抢光 3-积分不足 4-出错 5-相同物品只能兑换一次"""
+	has_got_one = 0
+	try:
+		with transaction.atomic():
+			myrwd=Rewards.objects.select_for_update().get(id=rewardid)
+			myrwd.refresh_from_db()
+
+			actyp=myrwd.action_type.actiontype_code
+
+			#若奖品仍有剩余
+			if myrwd.reward_left >= 1:
+				myrwd.reward_left -= 1
+				has_got_one = 1
+
+				hist = MyRewards.objects.filter(username=usrname,action=Actions.objects.get(id=actionid),reward=Rewards.objects.get(id=rewardid))
+
+				if hist:
+					has_got_one = 5
+				else:
+					myrwdrec = MyRewards(username=usrname,action=Actions.objects.get(id=actionid),reward=Rewards.objects.get(id=rewardid),reward_dt=datetime.datetime.now().strftime('%Y-%m-%d'),isExchg=False)
+				
+				#若不是抽奖活动，则需扣除相应的积分
+				if actyp <> ACTIONTYPEOFREWARD and has_got_one == 1:
+					cur_user = User.objects.get(username=usrname)
+					#判断用户积分是否足够
+					if cur_user.scores >= myrwd.reward_cost:
+						add_uscore(usrname,TYPE_OF_EXCHG,(0-myrwd.reward_cost))
+					else:
+						has_got_one = 3
+				if has_got_one == 1:
+					myrwdrec.save()
+					myrwd.save()
+			else:
+				has_got_one = 2		
+	except Exception as e:
+		print e
+		has_got_one = 4
+	finally:
+		return has_got_one

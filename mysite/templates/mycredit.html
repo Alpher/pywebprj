@@ -146,7 +146,7 @@
 							{{forloop.counter}}
 						</td>
 						<td>
-							{{exchg.exchg_dt|date:"Y-m-d"}}
+							{{exchg.reward_dt|date:"Y-m-d"}}
 						</td>
 						<td>
 							{{exchg.reward}}
@@ -155,7 +155,11 @@
 							{{exchg.reward.reward_cost}}
 						</td>
 						<td>
+							{% ifequal exchg.isExchg 1 %}
 							<a href="/myrewards/{{exchg.id}}/">查看</a>
+							{% else %}
+							<a href="/getrewards/{{exchg.id}}/">兑换</a>
+							{% endifequal %}
 						</td>
 					</tr>
 				{% endfor %}

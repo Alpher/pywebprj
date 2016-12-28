@@ -89,83 +89,89 @@ $(document).ready(function(){
         var chance = $('#mychance').text();
         var score = $('#myscore').text();
         var handle = true;
+        var action_valid = $('#id_action_valid').val();
 
-        if(got_one=="True"){
-            handle = false;
-            alert("本次活动你已经中过奖，不能再抽奖");
-        }else{
-            if(chance <= 0 && score < Number(lottery_score)){
+        if(action_valid=="True"){
+            if(got_one=="True"){
                 handle = false;
-            }else if(chance <= 0 && score >= Number(lottery_score)){
-                var status = confirm("你今天的抽奖机会已用完，你仍可使用"+lottery_score+"积分额外抽奖一次，是否使用积分?");
-                if(status){
-                    handle = true;
-                }else{
+                alert("本次活动你已经中过奖，不能再抽奖");
+            }else{
+                if(chance <= 0 && score < Number(lottery_score)){
                     handle = false;
-                };
+                }else if(chance <= 0 && score >= Number(lottery_score)){
+                    var status = confirm("你今天的抽奖机会已用完，你仍可使用"+lottery_score+"积分额外抽奖一次，是否使用积分?");
+                    if(status){
+                        handle = true;
+                    }else{
+                        handle = false;
+                    };
+                    
+                }else{
+                    handle = true;
+                }
                 
-            }else{
-                handle = true;
-            }
-            
-        };
-
-        if(!handle){
-            if(got_one!="True"){
-            alert("你今天的抽奖机会已用完，明天再来吧");
             };
-        }else{
-            if (click) {//click控制一次抽奖过程中不能重复点击抽奖按钮，后面的点击不响应
-                return false;
+    
+            if(!handle){
+                if(got_one!="True"){
+                alert("你今天的抽奖机会已用完，明天再来吧");
+                };
             }else{
-       	    		$.ajax({
-                     type:'GET',
-                     url:'/roll/',
-                     dataType:'json',
-                     //data:{"avatarimg":img,},
-                     success:function(data)
-                      { 
-
-                        var statu = data['status']
-                        var rollnum = data['rollnum'];
-                        cur_user = data['cur_username'];
-                        got_one = data['has_got_one'];
-                        rewardstr = data['rewardstr'];
-
-                        if(statu==0){
-                            lotteryinfo="本次活动你已经中过奖，不能再抽奖";
-                        }else if(statu==-1){
-                            lotteryinfo="你今天的抽奖机会已用完，明天再来吧";
-                        }else{
-                            //alert(rollnum);
-                            lottery.prize=rollnum;
-
-                            if(got_one=="True"){
-
-                                lotteryinfo="恭喜你抽中"+rewardstr
-                                $('#id_got_one').val('True');
-
+                if (click) {//click控制一次抽奖过程中不能重复点击抽奖按钮，后面的点击不响应
+                    return false;
+                }else{
+                        $.ajax({
+                         type:'GET',
+                         url:'/roll/',
+                         dataType:'json',
+                         //data:{"avatarimg":img,},
+                         success:function(data)
+                          { 
+    
+                            var statu = data['status']
+                            var rollnum = data['rollnum'];
+                            cur_user = data['cur_username'];
+                            got_one = data['has_got_one'];
+                            rewardstr = data['rewardstr'];
+    
+                            if(statu==0){
+                                lotteryinfo="本次活动你已经中过奖，不能再抽奖";
+                            }else if(statu==-1){
+                                lotteryinfo="你今天的抽奖机会已用完，明天再来吧";
                             }else{
-                                lotteryinfo="你与大奖擦肩而过"
+                                //alert(rollnum);
+                                lottery.prize=rollnum;
+    
+                                if(got_one=="True"){
+    
+                                    lotteryinfo="恭喜你抽中"+rewardstr
+                                    $('#id_got_one').val('True');
+    
+                                }else{
+                                    lotteryinfo="你与大奖擦肩而过"
+                                }
+            
+                                lottery.speed=100;
+                                roll();    //转圈过程不响应click事件，会将click置为false
+                                click=true; //一次抽奖完成后，设置click为true，可继续抽奖
+                                $('#mychance').text(data['mychance']);
+                                $('#myscore').text(data['myscore']);
+                              return false;
                             }
+                            
+                          },
+                         error:function(data)
+                         {
+                          alert("无法获取抽奖数据,请重试"); 
+                         }
+                        });
         
-                            lottery.speed=100;
-                		    roll();    //转圈过程不响应click事件，会将click置为false
-                		    click=true; //一次抽奖完成后，设置click为true，可继续抽奖
-                            $('#mychance').text(data['mychance']);
-                            $('#myscore').text(data['myscore']);
-                		  return false;
-                        }
-                        
-                      },
-                     error:function(data)
-                     {
-                      alert("无法获取抽奖数据,请重试"); 
-                     }
-                    });
-    
-    
-            };
+        
+                };
+            }; //活动可用时逻辑--到此结束
+        }else{
+            alert("本次活动已经结束,感谢你的参与,下次再来吧");
         };
+        
     });
 });

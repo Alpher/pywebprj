@@ -11,7 +11,7 @@ from checkin.models import *
 import datetime
 from django.db import transaction
 from django.http import JsonResponse
-from mysite.settings import TYPE_OF_CHKIN,TYPE_OF_EXCHG,TYPE_OF_VIOLT,CHKIN_SCORE,CHKIN_SCORE_PLUS
+from mysite.settings import TYPE_OF_CHKIN,TYPE_OF_EXCHG,TYPE_OF_VIOLT,CHKIN_SCORE,CHKIN_SCORE_PLUS,CHKIN_SCORE_INITIAL_DATE
 
 # Create your views here.
 
@@ -44,8 +44,8 @@ def add_uscore(uname,optype,opscore):
 			
 					thisscore = CHKIN_SCORE
 			
-					#每年第一天
-					if datetime.datetime.now().strftime("%m-%d") == '01-01':
+					#每年清零日期
+					if datetime.datetime.now().strftime("%m-%d") == CHKIN_SCORE_INITIAL_DATE:
 						#初始化
 						sov.days_in_a_row = 1
 						sov.days_in_month = 1

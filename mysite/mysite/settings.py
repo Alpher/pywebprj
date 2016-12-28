@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'el_pagination',
     'ckeditor',
     'ckeditor_uploader',
+    'lottery',
+    'smarket',
 ]
 
 MIDDLEWARE = [
@@ -189,6 +191,9 @@ TYPE_OF_VIOLT = 3
 #积分加值
 CHKIN_SCORE = 10
 CHKIN_SCORE_PLUS = 15
+
+#签到积分清零日期 格式 MM-dd
+CHKIN_SCORE_INITIAL_DATE = '04-25'
 
 #社区主题上传图片最大尺寸(像素)
 IMGWIDTH = 600

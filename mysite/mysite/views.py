@@ -25,10 +25,3 @@ def aboutus(request):
 		parmdic['isStaff'] = request.user.is_staff
 	return render(request,'about.html',parmdic)
 
-#To be moved to market app
-@login_required
-def smarket(request):
-	"""积分商城页面"""
-	parmdic = getUserBase(request)
-	return render(request,'scoremarket.html',parmdic)
-
