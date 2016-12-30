@@ -8,11 +8,11 @@ import re
 from django.contrib.auth.models import User
 
 #从数据库参数表中获取地区列表
-def getProv():
-	regSet = []
-	for reg in Region.objects.all():
-		regSet.append((reg.region_id,reg.region_dec))
-	return tuple(regSet)
+# def getProv():
+# 	regSet = []
+# 	for reg in Region.objects.all():
+# 		regSet.append((reg.region_id,reg.region_dec))
+# 	return tuple(regSet)
 
 
 #账户资料修改表单
@@ -25,11 +25,16 @@ class ModifyUserForm(forms.Form):
                                    widget=forms.RadioSelect())
 	birth=forms.DateField(label=u'生日:',widget=SelectDateWidget(years=tuple([i for i in xrange(1966,1997)])))
 	#region=forms.ChoiceField(label=u'地区:',choices=((u'1',u'广东'),))
-	region=forms.ChoiceField(label=u'地区:',choices=getProv())
+	region=forms.ChoiceField(label=u'地区:')
 	phone=forms.CharField(max_length=11,required=False,label='手机:')
 	
 	#当前账号
 	CurUser = ''
+
+	#从数据库参数表中获取地区列表
+	def __init__(self,*args,**kwargs):
+		super(ModifyUserForm,self).__init__(*args,**kwargs)
+		self.fields['region'].choices=((x.region_id,x.region_dec) for x in Region.objects.all())
 
 	def clean_username(self):
 		self.CurUser = self.cleaned_data['username']
