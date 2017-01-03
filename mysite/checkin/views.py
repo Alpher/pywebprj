@@ -11,7 +11,7 @@ from checkin.models import *
 import datetime
 from django.db import transaction
 from django.http import JsonResponse
-from mysite.settings import TYPE_OF_CHKIN,TYPE_OF_EXCHG,TYPE_OF_VIOLT,CHKIN_SCORE,CHKIN_SCORE_PLUS,CHKIN_SCORE_INITIAL_DATE
+from mysite.settings import TYPE_OF_CHKIN,TYPE_OF_EXCHG,TYPE_OF_VIOLT,CHKIN_SCORE,CHKIN_SCORE_PLUS,CHKIN_SCORE_INITIAL_DATE,CHKIN_IN_A_ROW
 
 # Create your views here.
 
@@ -43,6 +43,9 @@ def add_uscore(uname,optype,opscore):
 					cur_dt = datetime.datetime.now().strftime("%Y-%m-%d")
 			
 					thisscore = CHKIN_SCORE
+
+					#月初
+					month_first = datetime.datetime.now().strftime('%Y-%m')+'-01'
 			
 					#每年清零日期
 					if datetime.datetime.now().strftime("%m-%d") == CHKIN_SCORE_INITIAL_DATE:
@@ -61,6 +64,9 @@ def add_uscore(uname,optype,opscore):
 						#月初
 						if datetime.datetime.now().strftime("%d") == '01':
 							sov.days_in_month = 1
+						#若上次签到日期是上个月
+						elif last_chkindt < month_first:
+							sov.days_in_month = 1
 						else:
 							sov.days_in_month += 1
 					#连签
@@ -74,7 +80,7 @@ def add_uscore(uname,optype,opscore):
 							sov.days_in_month += 1
 			
 						#连接签到10天及以上奖励15积分
-						if last_days_in_a_row >= 9:
+						if last_days_in_a_row >= CHKIN_IN_A_ROW:
 							sov.accum_score += CHKIN_SCORE_PLUS
 							user.scores += CHKIN_SCORE_PLUS
 							thisscore = CHKIN_SCORE_PLUS

@@ -195,6 +195,9 @@ CHKIN_SCORE_PLUS = 15
 #签到积分清零日期 格式 MM-dd
 CHKIN_SCORE_INITIAL_DATE = '04-25'
 
+#连续签到奖励(+1)天数
+CHKIN_IN_A_ROW = 9
+
 #社区主题上传图片最大尺寸(像素)
 IMGWIDTH = 600
 IMGHEIGHT = 450
