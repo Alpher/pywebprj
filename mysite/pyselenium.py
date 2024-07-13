@@ -7,4 +7,5 @@ if __name__ == '__main__':
     display.start()  
     browser = webdriver.Firefox(executable_path='')  
     browser.get('http://www.baidu.com')  
-    print browser.title
+    print(browser.title)
+    print("hey there")
